@@ -28,7 +28,7 @@ body.cat-shisha {
   --card: #1f1640;
 }
 
-/* Ãœbersicht / Index */
+/* Übersicht / Index */
 body.cat-home {
   --amber: #d4af37;
   --amber-dark: #b8941d;
@@ -87,6 +87,22 @@ header .subtitle {
 }
 .back-link:hover { color: var(--amber-light); border-color: var(--amber); }
 
+.header-icon-btn {
+  text-decoration: none;
+  font-size: 1.2rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.header-icon-btn:hover { border-color: var(--amber); transform: rotate(30deg); }
+
 .sync-status {
   display: flex;
   align-items: center;
@@ -111,7 +127,7 @@ header .subtitle {
 
 .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Startseite (Kategorie-Kacheln) â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Startseite (Kategorie-Kacheln) ───────── */
 .home-hero {
   text-align: center;
   padding: 3rem 1rem 2rem;
@@ -202,7 +218,7 @@ header .subtitle {
   padding: 0 1rem;
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Tabs ───────── */
 .tabs { display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 2px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tab-btn {
   background: none;
@@ -223,7 +239,7 @@ header .subtitle {
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Form â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Form ───────── */
 .form-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -267,7 +283,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--amber); }
 textarea { resize: vertical; min-height: 80px; }
 select option { background: var(--bg2); }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Star-Picker â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Star-Picker ───────── */
 .star-container { display: inline-flex; flex-direction: row-reverse; }
 .star-container input[type=radio] { display: none; }
 .star-container label {
@@ -283,7 +299,7 @@ select option { background: var(--bg2); }
 .star-container label:hover ~ label,
 .star-container input[type=radio]:checked ~ label { color: var(--amber); }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Score-Slider â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Score-Slider ───────── */
 .score-wrap { display: flex; align-items: center; gap: 1rem; }
 .score-wrap input[type=range] {
   flex: 1; accent-color: var(--amber); padding: 0; background: none; border: none;
@@ -296,7 +312,7 @@ select option { background: var(--bg2); }
   text-align: right;
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Photo-Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Photo-Upload ───────── */
 .photo-upload {
   border: 2px dashed var(--border);
   border-radius: 8px;
@@ -313,7 +329,7 @@ select option { background: var(--bg2); }
 .photo-preview { max-height: 200px; border-radius: 6px; margin-top: 0.75rem; }
 .photo-hint { color: var(--text-muted); font-size: 0.9rem; font-style: italic; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Buttons ───────── */
 .btn {
   padding: 0.7rem 1.6rem;
   border-radius: 6px;
@@ -341,7 +357,7 @@ select option { background: var(--bg2); }
 .btn-danger:hover { filter: brightness(1.2); }
 .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end; flex-wrap: wrap; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Collection â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Collection ───────── */
 .collection-header {
   display: flex;
   justify-content: space-between;
@@ -365,7 +381,7 @@ select option { background: var(--bg2); }
 .empty-state .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
 .empty-state p { font-style: italic; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Karten â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Karten ───────── */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -427,7 +443,7 @@ select option { background: var(--bg2); }
 }
 .card-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.6rem; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Modal ───────── */
 .modal-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -471,7 +487,7 @@ select option { background: var(--bg2); }
 .tasting-section p { color: var(--text); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
 .modal-actions { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Setup-Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Setup-Modal ───────── */
 #setupModal { display: flex; }
 .setup-step {
   display: flex;
@@ -497,7 +513,7 @@ select option { background: var(--bg2); }
 .step-content .hint { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
 .step-content input { margin-top: 0.4rem; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Settings â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Settings ───────── */
 .settings-row {
   display: flex;
   justify-content: space-between;
@@ -510,7 +526,7 @@ select option { background: var(--bg2); }
 .settings-row:last-child { border-bottom: none; }
 .settings-row strong { color: var(--amber-light); }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Stats ───────── */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
 .stat-card {
   background: var(--card); border: 1px solid var(--border); border-radius: 8px;
@@ -519,7 +535,7 @@ select option { background: var(--bg2); }
 .stat-value { font-size: 2.2rem; color: var(--amber-light); font-weight: bold; }
 .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.3rem; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Notification â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Notification ───────── */
 .notification {
   position: fixed; bottom: 2rem; right: 2rem; left: 2rem;
   max-width: 400px;
@@ -536,13 +552,14 @@ select option { background: var(--bg2); }
 .notification.error { background: var(--danger); }
 .notification.success { background: var(--success); color: #000; }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€ Mobile â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ───────── Mobile ───────── */
 @media (max-width: 600px) {
-  header { padding: 1rem; gap: 0.75rem; }
+  header { padding: 1rem; gap: 0.5rem; }
   header h1 { font-size: 1.2rem; letter-spacing: 1px; }
   header .subtitle { font-size: 0.7rem; }
   .glass-icon { font-size: 1.6rem; }
   .sync-status .sync-text { display: none; }
+  .back-link, .header-icon-btn { width: 32px; height: 32px; font-size: 1rem; }
   .container { padding: 1rem; }
   .form-grid { grid-template-columns: 1fr; }
   .detail-grid { grid-template-columns: 1fr; }

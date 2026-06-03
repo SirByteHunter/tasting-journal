@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1a1208" />
+  <title>Einstellungen – Tasting Journal</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="stylesheet" href="shared/styles.css" />
+</head>
+<body class="cat-home">
+
+<header>
+  <a href="index.html" class="back-link" title="Zur Übersicht">←</a>
+  <div class="glass-icon">⚙️</div>
+  <div class="header-text">
+    <h1>Einstellungen</h1>
+    <div class="subtitle">GitHub-Verbindung &amp; Datenverwaltung</div>
+  </div>
+  <div class="sync-status" id="syncStatus" title="Sync-Status">
+    <span class="sync-dot"></span>
+    <span class="sync-text">Lade…</span>
+  </div>
+</header>
+
+<div id="setupContainer"></div>
+
+<div class="container" id="appContent" style="display:none">
+
+  <!-- ── GitHub-Verbindung ── -->
+  <div class="form-card" style="margin-bottom:1.5rem">
+    <h2>🔗 GitHub-Verbindung</h2>
+    <div class="settings-row">
+      <div>
+        <strong>Verbundener Gist</strong>
+        <div id="connectionInfo" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="UI.copyGistId()">📋 Gist-ID kopieren</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <strong>Daten neu laden</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Falls du auf einem anderen Gerät Änderungen gemacht hast.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="reloadAndUpdate()">🔄 Aktualisieren</button>
+    </div>
+  </div>
+
+  <!-- ── Daten-Übersicht ── -->
+  <div class="form-card" style="margin-bottom:1.5rem">
+    <h2>📊 Datenbestand</h2>
+    <div class="stats-grid" style="margin-bottom:0">
+      <div class="stat-card">
+        <div class="stat-value" id="totalCount">0</div>
+        <div class="stat-label">Verkostungen gesamt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="whiskyCount">0</div>
+        <div class="stat-label">Whisky</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="shishaCount">0</div>
+        <div class="stat-label">Shisha</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Import / Export ── -->
+  <div class="form-card" style="margin-bottom:1.5rem">
+    <h2>💾 Datenverwaltung</h2>
+    <div class="settings-row">
+      <div>
+        <strong>Daten exportieren</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei mit ALLEN Verkostungen (alle Kategorien) herunterladen. Empfohlen als regelmäßiges Backup.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ Download JSON</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <strong>Daten importieren</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei einlesen. <strong style="color:var(--danger)">Achtung:</strong> Ersetzt ALLE bestehenden Daten komplett. Vorher exportieren als Backup empfohlen.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="UI.triggerImport()">⬆️ Import JSON</button>
+      <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="handleImportAndRefresh(event)" />
+    </div>
+  </div>
+
+  <!-- ── Gefahrenzone ── -->
+  <div class="form-card" style="border-color:var(--danger)">
+    <h2 style="color:var(--danger)">⚠️ Gefahrenzone</h2>
+    <div class="settings-row">
+      <div>
+        <strong style="color:var(--danger)">Verbindung trennen</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Token und Gist-ID von diesem Gerät entfernen. Deine Daten im Gist bleiben erhalten und sind weiterhin auf anderen Geräten verfügbar. Beim nächsten Aufruf der App musst du die Verbindung neu einrichten.</p>
+      </div>
+      <button class="btn btn-danger" onclick="TJ.resetSetup()">🚪 Trennen</button>
+    </div>
+  </div>
+
+  <!-- ── Hilfe-Hinweis ── -->
+  <div style="margin-top:2rem;padding:1.5rem;background:var(--card);border-radius:10px;border:1px solid var(--border);color:var(--text-muted);font-size:0.9rem;line-height:1.6">
+    <strong style="color:var(--amber-light);display:block;margin-bottom:0.5rem">💡 Tipps</strong>
+    <ul style="list-style:none;padding:0">
+      <li style="margin-bottom:0.5rem">• <strong>Sync-Status</strong> oben im Header zeigt, ob die App synchronisiert ist (grün), gerade syncronisiert (orange) oder offline (rot).</li>
+      <li style="margin-bottom:0.5rem">• <strong>Gist-ID</strong> kannst du auf andere Geräte kopieren, um sie mit denselben Daten zu verbinden.</li>
+      <li style="margin-bottom:0.5rem">• <strong>Regelmäßige Backups</strong> per JSON-Export auf dein iCloud/OneDrive sichern.</li>
+      <li>• <strong>Import ersetzt</strong> alle Daten komplett – nicht zum Zusammenführen geeignet.</li>
+    </ul>
+  </div>
+</div>
+
+<script src="shared/core.js"></script>
+<script src="shared/ui.js"></script>
+<script>
+  // Setup-Modal einbauen
+  document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
+
+  function updateCounts() {
+    const w = TJ.getItems('whisky').length;
+    const s = TJ.getItems('shisha').length;
+    document.getElementById('whiskyCount').textContent = w;
+    document.getElementById('shishaCount').textContent = s;
+    document.getElementById('totalCount').textContent = w + s;
+  }
+
+  function renderConnectionInfo() {
+    const info = document.getElementById('connectionInfo');
+    if (!info || !TJ.gistId) return;
+    info.innerHTML = `
+      Gist <code style="background:var(--bg2);padding:0.1rem 0.4rem;border-radius:4px;color:var(--amber-light)">${TJ.gistId.substring(0, 8)}…${TJ.gistId.substring(TJ.gistId.length - 4)}</code><br>
+      <a href="https://gist.github.com/${TJ.gistId}" target="_blank" style="color:var(--amber);font-size:0.85rem">Auf GitHub öffnen ↗</a>
+    `;
+  }
+
+  async function reloadAndUpdate() {
+    await TJ.loadData();
+    updateCounts();
+  }
+
+  async function handleImportAndRefresh(event) {
+    await UI.handleImport(event);
+    updateCounts();
+  }
+
+  function onDataLoaded() {
+    updateCounts();
+    renderConnectionInfo();
+  }
+
+  function onSetupComplete() {
+    updateCounts();
+    renderConnectionInfo();
+  }
+
+  TJ.init('home');
+</script>
+</body>
+</html>

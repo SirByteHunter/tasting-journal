@@ -6,10 +6,10 @@
 const UI = {
   // ── Header (kategorie-spezifisch) ──────────────────────────────
   renderHeader(opts) {
-    const { icon, title, subtitle, accent } = opts;
+    const { icon, title, subtitle, accent, isHome } = opts;
     return `
 <header class="cat-${accent}">
-  <a href="index.html" class="back-link" title="Zur Übersicht">←</a>
+  ${isHome ? '' : '<a href="index.html" class="back-link" title="Zur Übersicht">←</a>'}
   <div class="glass-icon">${icon}</div>
   <div class="header-text">
     <h1>${escapeHtml(title)}</h1>
@@ -19,6 +19,7 @@ const UI = {
     <span class="sync-dot"></span>
     <span class="sync-text">Lade…</span>
   </div>
+  <a href="settings.html" class="header-icon-btn" title="Einstellungen" aria-label="Einstellungen">⚙️</a>
 </header>`;
   },
 
@@ -171,59 +172,31 @@ const UI = {
     if (window.App && App.onTabSwitch) App.onTabSwitch(name);
   },
 
-  // ── Settings-Tab (gleich für alle Kategorien) ──────────────────
+  // ── Kategorie-Settings-Tab ─────────────────────────────────────
+  // Nur kategoriespezifische Einstellungen. Globale Einstellungen
+  // (GitHub-Verbindung, Import/Export, Reset) liegen in settings.html.
   renderSettingsTab() {
     return `
 <div id="tab-settings" class="tab-content">
   <div class="form-card">
     <h2>Einstellungen</h2>
+    <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem">
+      Hier kommen später kategoriespezifische Einstellungen hin.
+    </p>
     <div class="settings-row">
       <div>
-        <strong>GitHub-Verbindung</strong>
-        <div id="connectionInfo" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem"></div>
+        <strong>Globale Einstellungen</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">GitHub-Verbindung, Import &amp; Export, Daten neu laden – alles auf der Übersichtsseite.</p>
       </div>
-      <button class="btn btn-secondary" onclick="UI.copyGistId()">📋 Gist-ID kopieren</button>
-    </div>
-    <div class="settings-row">
-      <div>
-        <strong>Daten exportieren</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei mit ALLEN Verkostungen (alle Kategorien) herunterladen.</p>
-      </div>
-      <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ Download JSON</button>
-    </div>
-    <div class="settings-row">
-      <div>
-        <strong>Daten importieren</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei einlesen. <strong style="color:var(--danger)">Achtung:</strong> Ersetzt ALLE bestehenden Daten komplett. Vorher exportieren als Backup empfohlen.</p>
-      </div>
-      <button class="btn btn-secondary" onclick="UI.triggerImport()">⬆️ Import JSON</button>
-      <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="UI.handleImport(event)" />
-    </div>
-    <div class="settings-row">
-      <div>
-        <strong>Daten neu laden</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Falls du auf einem anderen Gerät Änderungen gemacht hast.</p>
-      </div>
-      <button class="btn btn-secondary" onclick="TJ.loadData()">🔄 Aktualisieren</button>
-    </div>
-    <div class="settings-row">
-      <div>
-        <strong style="color:var(--danger)">Verbindung trennen</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Token von diesem Gerät entfernen. Daten im Gist bleiben erhalten.</p>
-      </div>
-      <button class="btn btn-danger" onclick="TJ.resetSetup()">🚪 Trennen</button>
+      <a href="settings.html" class="btn btn-primary" style="text-decoration:none;display:inline-block">⚙️ Globale Einstellungen öffnen</a>
     </div>
   </div>
 </div>`;
   },
 
   renderSettingsContent() {
-    const info = document.getElementById('connectionInfo');
-    if (!info || !TJ.gistId) return;
-    info.innerHTML = `
-      Verbunden mit Gist <code style="background:var(--bg2);padding:0.1rem 0.4rem;border-radius:4px;color:var(--amber-light)">${TJ.gistId.substring(0, 8)}…${TJ.gistId.substring(TJ.gistId.length - 4)}</code><br>
-      <a href="https://gist.github.com/${TJ.gistId}" target="_blank" style="color:var(--amber);font-size:0.85rem">Auf GitHub öffnen ↗</a>
-    `;
+    // Wird derzeit nicht mehr für globale Settings genutzt.
+    // Platzhalter für zukünftige kategoriespezifische Settings.
   },
 
   copyGistId() {
