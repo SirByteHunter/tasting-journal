@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8" /><title>Google Auth</title></head>
+<body>
+<script>
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get('access_token');
+  const expiresIn = parseInt(params.get('expires_in') || '3600');
+  const error = params.get('error');
+
+  if (token) {
+    window.opener.postMessage({ type: 'gdrive-token', token, expiresIn }, window.location.origin);
+  } else {
+    window.opener.postMessage({ type: 'gdrive-error', error: error || 'Unbekannter Fehler' }, window.location.origin);
+  }
+  window.close();
+</script>
+</body>
+</html>

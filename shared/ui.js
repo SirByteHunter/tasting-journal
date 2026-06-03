@@ -127,7 +127,13 @@ const UI = {
   <div id="photoHint">
     <div style="font-size:2rem">📷</div>
     <div class="photo-hint">Klicken oder Foto auswählen</div>
-    <div class="photo-hint" style="font-size:0.75rem;margin-top:0.3rem">Wird automatisch komprimiert</div>
+    <div class="photo-hint" style="font-size:0.75rem;margin-top:0.3rem" id="photoHintSub">
+      ${window.GDrive && GDrive.isConnected() ? 'Wird in Google Drive gespeichert' : 'Wird lokal komprimiert gespeichert'}
+    </div>
+  </div>
+  <div id="photoUploading" style="display:none;text-align:center;padding:1rem">
+    <div style="font-size:1.5rem">⏳</div>
+    <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.3rem">Lade hoch…</div>
   </div>
   <img id="photoPreview" class="photo-preview" style="display:none" />
 </div>`;
@@ -136,11 +142,39 @@ const UI = {
   async previewPhoto(e) {
     const file = e.target.files[0];
     if (!file) return;
+
+    const hint = document.getElementById('photoHint');
+    const uploading = document.getElementById('photoUploading');
+    const preview = document.getElementById('photoPreview');
+
+    // Immer zuerst lokal komprimieren (für Preview)
     const compressed = await compressImage(file);
-    const img = document.getElementById('photoPreview');
-    img.src = compressed;
-    img.style.display = 'block';
-    document.getElementById('photoHint').style.display = 'none';
+    preview.src = compressed;
+
+    if (window.GDrive && GDrive.isConnected()) {
+      hint.style.display = 'none';
+      uploading.style.display = 'block';
+      preview.style.display = 'none';
+      try {
+        const filename = 'photo_' + Date.now() + '.jpg';
+        const driveUrl = await GDrive.uploadPhoto(compressed, filename);
+        preview.src = driveUrl;
+        preview.style.display = 'block';
+        uploading.style.display = 'none';
+        TJ.notify('📷 Foto in Google Drive gespeichert', 'success');
+      } catch (err) {
+        console.error(err);
+        uploading.style.display = 'none';
+        // Fallback: lokal speichern
+        preview.src = compressed;
+        preview.style.display = 'block';
+        hint.style.display = 'none';
+        TJ.notify('⚠️ Drive-Upload fehlgeschlagen – lokal gespeichert', 'error');
+      }
+    } else {
+      preview.style.display = 'block';
+      hint.style.display = 'none';
+    }
   },
 
   getPhotoData() {
@@ -151,6 +185,8 @@ const UI = {
   setPhotoData(src) {
     const preview = document.getElementById('photoPreview');
     const hint = document.getElementById('photoHint');
+    const uploading = document.getElementById('photoUploading');
+    if (uploading) uploading.style.display = 'none';
     if (src) {
       preview.src = src;
       preview.style.display = 'block';

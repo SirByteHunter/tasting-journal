@@ -68,6 +68,26 @@
     </div>
   </div>
 
+  <!-- ── Google Drive ── -->
+  <div class="form-card" style="margin-bottom:1.5rem">
+    <h2>📸 Google Drive – Foto-Speicher</h2>
+    <div id="driveStatus" style="margin-bottom:1rem"></div>
+    <div class="settings-row" id="driveConnectRow">
+      <div>
+        <strong>Mit Google Drive verbinden</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Fotos werden in Google Drive gespeichert statt im Gist. Spart Speicherplatz und skaliert für hunderte Einträge.</p>
+      </div>
+      <button class="btn btn-primary" onclick="connectDrive()" id="driveConnectBtn">🔗 Verbinden</button>
+    </div>
+    <div class="settings-row" id="driveDisconnectRow" style="display:none">
+      <div>
+        <strong style="color:var(--danger)">Google Drive trennen</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Neue Fotos werden wieder lokal im Gist gespeichert. Bestehende Drive-Fotos bleiben erhalten.</p>
+      </div>
+      <button class="btn btn-danger" onclick="disconnectDrive()">🔌 Trennen</button>
+    </div>
+  </div>
+
   <!-- ── Import / Export ── -->
   <div class="form-card" style="margin-bottom:1.5rem">
     <h2>💾 Datenverwaltung</h2>
@@ -114,9 +134,48 @@
 
 <script src="shared/core.js"></script>
 <script src="shared/ui.js"></script>
+<script src="shared/gdrive.js"></script>
 <script>
   // Setup-Modal einbauen
   document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
+
+  function updateDriveUI() {
+    const connected = GDrive.isConnected();
+    const status = document.getElementById('driveStatus');
+    const connectRow = document.getElementById('driveConnectRow');
+    const disconnectRow = document.getElementById('driveDisconnectRow');
+    if (connected) {
+      status.innerHTML = `<div style="color:#4caf50;font-size:0.9rem">✅ Verbunden – Fotos werden in Google Drive gespeichert</div>`;
+      connectRow.style.display = 'none';
+      disconnectRow.style.display = '';
+    } else {
+      status.innerHTML = `<div style="color:var(--text-muted);font-size:0.9rem">Nicht verbunden – Fotos werden lokal im Gist gespeichert</div>`;
+      connectRow.style.display = '';
+      disconnectRow.style.display = 'none';
+    }
+  }
+
+  async function connectDrive() {
+    const btn = document.getElementById('driveConnectBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Verbinde…';
+    try {
+      await GDrive.login();
+      TJ.notify('✅ Google Drive verbunden', 'success');
+      updateDriveUI();
+    } catch (e) {
+      TJ.notify('❌ ' + e.message, 'error');
+    }
+    btn.disabled = false;
+    btn.textContent = '🔗 Verbinden';
+  }
+
+  function disconnectDrive() {
+    if (!confirm('Google Drive Verbindung trennen? Bestehende Drive-Fotos bleiben erhalten.')) return;
+    GDrive.disconnect();
+    TJ.notify('Google Drive getrennt', 'success');
+    updateDriveUI();
+  }
 
   function updateCounts() {
     const w = TJ.getItems('whisky').length;
@@ -148,11 +207,13 @@
   function onDataLoaded() {
     updateCounts();
     renderConnectionInfo();
+    updateDriveUI();
   }
 
   function onSetupComplete() {
     updateCounts();
     renderConnectionInfo();
+    updateDriveUI();
   }
 
   TJ.init('home');
