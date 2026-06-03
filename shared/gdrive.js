@@ -8,7 +8,7 @@ const GDrive = {
   TOKEN_KEY: 'tj_gdrive_token',
   TOKEN_EXPIRY_KEY: 'tj_gdrive_expiry',
   FOLDER_KEY: 'tj_gdrive_folder',
-  FOLDER_NAME: 'tasting-journal-pics',
+  FOLDER_NAME: 'Tasting Journal',
 
   token: null,
   folderId: null,
