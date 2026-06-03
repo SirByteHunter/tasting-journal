@@ -86,6 +86,14 @@
       </div>
       <button class="btn btn-danger" onclick="disconnectDrive()">🔌 Trennen</button>
     </div>
+    <div class="settings-row" id="driveMigrateRow" style="display:none">
+      <div>
+        <strong>Bestehende Fotos migrieren</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Alle Base64-Fotos aus dem Gist nach Google Drive verschieben. Verkleinert den Gist erheblich.</p>
+        <div id="migrateProgress" style="display:none;margin-top:0.5rem;font-size:0.85rem;color:var(--amber-light)"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="migratePhotos()" id="driveMigrateBtn">📤 Fotos migrieren</button>
+    </div>
   </div>
 
   <!-- ── Import / Export ── -->
@@ -144,15 +152,72 @@
     const status = document.getElementById('driveStatus');
     const connectRow = document.getElementById('driveConnectRow');
     const disconnectRow = document.getElementById('driveDisconnectRow');
+    const migrateRow = document.getElementById('driveMigrateRow');
+
     if (connected) {
       status.innerHTML = `<div style="color:#4caf50;font-size:0.9rem">✅ Verbunden – Fotos werden in Google Drive gespeichert</div>`;
       connectRow.style.display = 'none';
       disconnectRow.style.display = '';
+      // Migrieren-Button nur zeigen wenn Base64-Fotos vorhanden
+      const hasBase64 = [...TJ.getItems('whisky'), ...TJ.getItems('shisha')]
+        .some(t => t.photo && t.photo.startsWith('data:'));
+      migrateRow.style.display = hasBase64 ? '' : 'none';
     } else {
       status.innerHTML = `<div style="color:var(--text-muted);font-size:0.9rem">Nicht verbunden – Fotos werden lokal im Gist gespeichert</div>`;
       connectRow.style.display = '';
       disconnectRow.style.display = 'none';
+      migrateRow.style.display = 'none';
     }
+  }
+
+  async function migratePhotos() {
+    const btn = document.getElementById('driveMigrateBtn');
+    const progress = document.getElementById('migrateProgress');
+    btn.disabled = true;
+    progress.style.display = 'block';
+
+    const categories = ['whisky', 'shisha'];
+    let total = 0, done = 0, errors = 0;
+
+    // Zählen
+    for (const cat of categories) {
+      total += TJ.getItems(cat).filter(t => t.photo && t.photo.startsWith('data:')).length;
+    }
+
+    if (total === 0) {
+      progress.textContent = 'Keine Base64-Fotos gefunden.';
+      btn.disabled = false;
+      return;
+    }
+
+    progress.textContent = `0 / ${total} Fotos hochgeladen…`;
+
+    for (const cat of categories) {
+      const items = TJ.getItems(cat);
+      for (const item of items) {
+        if (!item.photo || !item.photo.startsWith('data:')) continue;
+        try {
+          const filename = 'photo_' + item.id + '.jpg';
+          const driveUrl = await GDrive.uploadPhoto(item.photo, filename);
+          item.photo = driveUrl;
+          done++;
+          progress.textContent = `${done} / ${total} Fotos hochgeladen…`;
+        } catch (e) {
+          errors++;
+          console.error('Migration fehlgeschlagen für', item.id, e);
+        }
+      }
+    }
+
+    // Speichern
+    TJ.saveCache();
+    await TJ.saveData();
+
+    progress.textContent = `✅ ${done} Fotos migriert${errors > 0 ? `, ${errors} Fehler` : ''} – Gist wurde aktualisiert`;
+    btn.disabled = false;
+    updateDriveUI();
+    updateCounts();
+    TJ.notify(`✅ ${done} Fotos nach Google Drive migriert`, 'success');
   }
 
   async function connectDrive() {
