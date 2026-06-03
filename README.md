@@ -1,6 +1,6 @@
 # 🍷 Tasting Journal
 
-Eine schlanke, schöne Web-App für deine persönliche Verkostungssammlung – Whisky, Shisha-Tabak und mehr. Daten werden in einem privaten GitHub Gist gespeichert und syncen automatisch zwischen all deinen Geräten.
+Eine schlanke, schöne Web-App für deine persönliche Verkostungssammlung – Whisky, Shisha-Tabak und mehr. Metadaten werden in einem privaten GitHub Gist gespeichert, Fotos optional in Google Drive – beides syncet automatisch zwischen all deinen Geräten.
 
 ## ✨ Features
 
@@ -9,8 +9,9 @@ Eine schlanke, schöne Web-App für deine persönliche Verkostungssammlung – W
 - 🔍 **Suche & Sortierung** in jeder Kategorie
 - 📊 **Statistiken** – Durchschnittspunkte, Top-Listen, Verteilungen
 - ☁️ **Sync zwischen allen Geräten** via privatem GitHub Gist
+- 📸 **Google Drive Foto-Speicher** – Fotos landen in deinem Google Drive statt im Gist, skaliert für hunderte Einträge
 - 📱 **Auf Handy als App nutzbar** – über Safari/Chrome zum Homescreen hinzufügen
-- 🔒 **Daten gehören dir** – sie liegen in DEINEM privaten Gist
+- 🔒 **Daten gehören dir** – sie liegen in DEINEM privaten Gist und Google Drive
 - ⚡ **Offline-fähig** – lokaler Cache, syncronisiert wenn online
 - 🎨 **Kategorie-spezifisches Design** – Whisky in Bernstein, Shisha in Lila
 
@@ -21,15 +22,21 @@ tasting-journal/
 ├── index.html              ← Startseite mit Kategorie-Kacheln
 ├── whisky.html / .js       ← Whisky-Verkostungen
 ├── shisha.html / .js       ← Shisha-Tabak-Verkostungen
+├── settings.html           ← Einstellungen (GitHub, Google Drive, Import/Export)
+├── gdrive-callback.html    ← OAuth2-Callback für Google Drive Login
 ├── shared/
 │   ├── core.js             ← Gist-Sync, Setup, Persistenz
+│   ├── gdrive.js           ← Google Drive OAuth2, Foto-Upload
 │   ├── ui.js               ← Wiederverwendbare UI-Komponenten
 │   └── styles.css          ← Gemeinsames Theming
 ├── manifest.json           ← Web-App-Manifest
 └── icon.png
 ```
 
-Die Daten werden in einem einzigen Gist als JSON-Datei gespeichert, mit getrennten Arrays pro Kategorie:
+**Datenspeicherung:**
+- **GitHub Gist** – alle Verkostungs-Metadaten (Text, Bewertungen, Notizen, Drive-URLs)
+- **Google Drive** – Fotos (optional, aber empfohlen für viele Einträge)
+
 ```json
 {
   "whisky": [...],
@@ -58,7 +65,7 @@ Nach 1–2 Minuten ist deine App erreichbar unter:
 https://[deinusername].github.io/tasting-journal/
 ```
 
-### Schritt 3: App öffnen und Token erstellen
+### Schritt 3: App öffnen und GitHub Token erstellen
 
 Beim ersten Aufruf führt dich die App durch das Setup:
 1. Klick auf **„🔑 Token erstellen"** – das öffnet GitHub mit den richtigen Berechtigungen
@@ -68,16 +75,22 @@ Beim ersten Aufruf führt dich die App durch das Setup:
 
 Beim ersten Setup wird automatisch ein **privater Gist** angelegt, der deine Daten speichert.
 
-### Schritt 4: Auf weiteren Geräten
+### Schritt 4: Google Drive für Fotos einrichten (empfohlen)
+
+Damit Fotos in Google Drive statt im Gist gespeichert werden:
+1. Öffne **⚙️ Einstellungen** → **„📸 Google Drive – Foto-Speicher"**
+2. Klick **„🔗 Verbinden"** und melde dich mit deinem Google-Konto an
+3. Ab sofort landen neue Fotos automatisch im Ordner **„Tasting Journal"** in deinem Drive
+4. Bestehende Base64-Fotos kannst du per **„📤 Fotos migrieren"** nachträglich verschieben
+
+### Schritt 5: Auf weiteren Geräten
 
 Auf einem zweiten Gerät (z.B. iPhone):
 1. Gleiche URL öffnen: `https://[deinusername].github.io/tasting-journal/`
 2. Token erstellen (oder den vom ersten Gerät weiterverwenden)
 3. **Wichtig:** Bei „Gist-ID" die ID vom ersten Gerät einfügen
    - Diese findest du in der App unter **⚙️ → „📋 Gist-ID kopieren"**
-   - Oder direkt auf https://gist.github.com (Eintrag „Tasting Journal – Daten")
-
-Damit synchronisieren beide Geräte gegen denselben Gist.
+4. Google Drive ebenfalls verbinden (Schritt 4 wiederholen)
 
 ## 📱 Auf dem Homescreen installieren
 
@@ -92,10 +105,12 @@ Damit synchronisieren beide Geräte gegen denselben Gist.
 
 ## 🔐 Sicherheitshinweise
 
-- Der **Token wird nur lokal im Browser** gespeichert (`localStorage`)
+- Der **GitHub Token wird nur lokal im Browser** gespeichert (`localStorage`)
 - Der **Gist ist privat** und nur über deinen Account erreichbar
 - Tokens haben **nur `gist`-Berechtigung** – sie können nichts anderes anrichten
-- Wenn du ein Gerät verlierst: erstelle einen neuen Token und [widerrufe den alten](https://github.com/settings/tokens)
+- Der **Google Drive Token** wird ebenfalls nur lokal gespeichert und läuft nach 1 Stunde ab
+- Fotos in Google Drive liegen in deinem eigenen Account
+- Wenn du ein Gerät verlierst: GitHub Token [widerrufen](https://github.com/settings/tokens), Google Drive in den Einstellungen trennen
 
 ## 🆕 Eigene Kategorie hinzufügen
 
@@ -118,3 +133,4 @@ python3 -m http.server 8000
 ## 📜 Lizenz
 
 MIT – mach damit was du willst.
+
