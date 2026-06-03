@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1a1208" />
+  <title>Tasting Journal</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="stylesheet" href="shared/styles.css" />
+</head>
+<body class="cat-home">
+
+<header>
+  <div class="glass-icon">🍷</div>
+  <div class="header-text">
+    <h1>Tasting Journal</h1>
+    <div class="subtitle">Deine persönliche Verkostungssammlung</div>
+  </div>
+  <div class="sync-status" id="syncStatus" title="Sync-Status">
+    <span class="sync-dot"></span>
+    <span class="sync-text">Lade…</span>
+  </div>
+</header>
+
+<!-- Setup-Modal wird per Script eingefügt -->
+<div id="setupContainer"></div>
+
+<div class="container" id="appContent" style="display:none">
+  <div class="home-hero">
+    <h1>Was darf's heute sein?</h1>
+    <p>Wähle eine Kategorie, um deine Verkostung zu dokumentieren.</p>
+  </div>
+
+  <div class="category-grid">
+    <a href="whisky.html" class="category-card" data-cat="whisky">
+      <div class="cat-icon">🥃</div>
+      <h2>Whisky</h2>
+      <div class="cat-desc">Single Malt, Bourbon, Rye<br>und alles dazwischen</div>
+      <div class="cat-count" id="count-whisky">0 Verkostungen</div>
+    </a>
+
+    <a href="shisha.html" class="category-card" data-cat="shisha">
+      <div class="cat-icon">💨</div>
+      <h2>Shisha-Tabak</h2>
+      <div class="cat-desc">Sorten, Geschmacksrichtungen<br>und Eindrücke</div>
+      <div class="cat-count" id="count-shisha">0 Verkostungen</div>
+    </a>
+
+    <div class="category-card coming-soon" data-cat="cigar">
+      <div class="cat-icon">🚬</div>
+      <h2>Zigarren</h2>
+      <div class="cat-desc">Bald verfügbar</div>
+      <div class="cat-count">— Coming soon —</div>
+    </div>
+
+    <div class="category-card coming-soon" data-cat="wine">
+      <div class="cat-icon">🍷</div>
+      <h2>Wein</h2>
+      <div class="cat-desc">Bald verfügbar</div>
+      <div class="cat-count">— Coming soon —</div>
+    </div>
+  </div>
+
+  <div class="home-stats">
+    <div class="stat-card">
+      <div class="stat-value" id="totalCount">0</div>
+      <div class="stat-label">Verkostungen gesamt</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="categoryCount">0</div>
+      <div class="stat-label">Kategorien aktiv</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:3rem;padding-bottom:2rem">
+    <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ Daten exportieren</button>
+    <button class="btn btn-secondary" onclick="TJ.loadData().then(updateCounts)">🔄 Aktualisieren</button>
+    <button class="btn btn-secondary" onclick="TJ.resetSetup()">🚪 Verbindung trennen</button>
+  </div>
+</div>
+
+<script src="shared/core.js"></script>
+<script src="shared/ui.js"></script>
+<script>
+  // Setup-Modal einbauen
+  document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
+
+  function updateCounts() {
+    const whiskyCount = TJ.getItems('whisky').length;
+    const shishaCount = TJ.getItems('shisha').length;
+    const total = whiskyCount + shishaCount;
+
+    document.getElementById('count-whisky').textContent =
+      whiskyCount === 1 ? '1 Verkostung' : `${whiskyCount} Verkostungen`;
+    document.getElementById('count-shisha').textContent =
+      shishaCount === 1 ? '1 Verkostung' : `${shishaCount} Verkostungen`;
+    document.getElementById('totalCount').textContent = total;
+
+    let activeCats = 0;
+    if (whiskyCount > 0) activeCats++;
+    if (shishaCount > 0) activeCats++;
+    document.getElementById('categoryCount').textContent = activeCats;
+  }
+
+  function onDataLoaded() { updateCounts(); }
+  function onSetupComplete() { updateCounts(); }
+
+  TJ.init('home');
+</script>
+</body>
+</html>

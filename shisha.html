@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f0a1f" />
+  <title>Shisha – Tasting Journal</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="stylesheet" href="shared/styles.css" />
+</head>
+<body class="cat-shisha">
+
+<div id="headerContainer"></div>
+<div id="setupContainer"></div>
+
+<div class="container" id="appContent" style="display:none">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="collection" onclick="UI.switchTab('collection')">Sammlung</button>
+    <button class="tab-btn" data-tab="add" onclick="UI.switchTab('add')">+ Neue</button>
+    <button class="tab-btn" data-tab="stats" onclick="UI.switchTab('stats')">Statistiken</button>
+    <button class="tab-btn" data-tab="settings" onclick="UI.switchTab('settings')">⚙️</button>
+  </div>
+
+  <!-- COLLECTION -->
+  <div id="tab-collection" class="tab-content active">
+    <div class="collection-header">
+      <h2>Alle Tabaksorten</h2>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Suchen…" oninput="App.renderCollection()" />
+        <select class="sort-select" id="sortSelect" onchange="App.renderCollection()">
+          <option value="date-desc">Neueste zuerst</option>
+          <option value="date-asc">Älteste zuerst</option>
+          <option value="score-desc">Beste Bewertung</option>
+          <option value="name-asc">Name A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div id="cardsContainer"></div>
+  </div>
+
+  <!-- ADD / EDIT FORM -->
+  <div id="tab-add" class="tab-content">
+    <div class="form-card">
+      <h2 id="formTitle">Neue Shisha-Verkostung</h2>
+      <input type="hidden" id="editId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Name / Bezeichnung *</label>
+          <input type="text" id="f-name" placeholder="z.B. Lemon Mint" />
+        </div>
+        <div class="form-group">
+          <label>Marke</label>
+          <input type="text" id="f-brand" placeholder="z.B. Al Fakher, 7 Days, Adalya" />
+        </div>
+        <div class="form-group">
+          <label>Geschmacksrichtung</label>
+          <select id="f-flavor">
+            <option value="">— Bitte wählen —</option>
+            <option>Frucht</option>
+            <option>Beeren</option>
+            <option>Zitrus</option>
+            <option>Minze / Frisch</option>
+            <option>Süß / Dessert</option>
+            <option>Tabakig / Klassisch</option>
+            <option>Würzig</option>
+            <option>Floral</option>
+            <option>Kaffee / Schokolade</option>
+            <option>Mix / Cocktail</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tabakbasis</label>
+          <select id="f-base">
+            <option value="">— Bitte wählen —</option>
+            <option>Virginia (hell)</option>
+            <option>Burley</option>
+            <option>Mischung</option>
+            <option>Dampfsteine</option>
+            <option>Unbekannt</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Schnitt</label>
+          <select id="f-cut">
+            <option value="">— Bitte wählen —</option>
+            <option>Fein</option>
+            <option>Mittel</option>
+            <option>Grob</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Feuchtigkeit</label>
+          <select id="f-moisture">
+            <option value="">— Bitte wählen —</option>
+            <option>Trocken</option>
+            <option>Leicht feucht</option>
+            <option>Saftig</option>
+            <option>Sehr saftig</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kopf / Bowl</label>
+          <input type="text" id="f-bowl" placeholder="z.B. Phunnel, Vortex, Killer Bowl" />
+        </div>
+        <div class="form-group">
+          <label>Hitze-Setup</label>
+          <input type="text" id="f-heat" placeholder="z.B. 3x 26mm Cocobrico" />
+        </div>
+        <div class="form-group">
+          <label>Verkostungsdatum</label>
+          <input type="date" id="f-date" />
+        </div>
+        <div class="form-group">
+          <label>Preis (€)</label>
+          <input type="number" id="f-price" placeholder="z.B. 8.50" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label>Punktzahl (0–100)</label>
+          <div class="score-wrap">
+            <input type="range" id="f-score" min="0" max="100" value="80" oninput="document.getElementById('scoreVal').textContent=this.value" />
+            <span class="score-val" id="scoreVal">80</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sterne (1–5)</label>
+          <div id="starPickerContainer"></div>
+        </div>
+        <div class="form-group">
+          <label>Rauchentwicklung</label>
+          <select id="f-smoke">
+            <option value="">— Bitte wählen —</option>
+            <option>Schwach</option>
+            <option>Mittel</option>
+            <option>Stark</option>
+            <option>Sehr stark</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Hitze-Verhalten</label>
+          <select id="f-heatBehavior">
+            <option value="">— Bitte wählen —</option>
+            <option>Sehr verträglich</option>
+            <option>Verträglich</option>
+            <option>Empfindlich</option>
+            <option>Sehr empfindlich</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Durchhaltevermögen</label>
+          <select id="f-stamina">
+            <option value="">— Bitte wählen —</option>
+            <option>Kurz (< 30 min)</option>
+            <option>Mittel (30–60 min)</option>
+            <option>Lang (1–2 h)</option>
+            <option>Sehr lang (> 2 h)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nikotinstärke</label>
+          <select id="f-nicotine">
+            <option value="">— Bitte wählen —</option>
+            <option>Sehr leicht</option>
+            <option>Leicht</option>
+            <option>Mittel</option>
+            <option>Stark</option>
+            <option>Sehr stark</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Geschmackseindruck</label>
+          <textarea id="f-taste" placeholder="Was schmeckst du? Aroma-Entwicklung, Süße, Frische…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Zugverhalten</label>
+          <textarea id="f-draw" placeholder="Wie zieht sich der Tabak? Wie fühlt sich der Rauch an?"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Persönliche Notizen</label>
+          <textarea id="f-notes" placeholder="Mix-Empfehlungen, Anlass, Vergleiche…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Foto vom Tabak / Verpackung</label>
+          <div id="photoUploadContainer"></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="App.resetForm()">Zurücksetzen</button>
+        <button class="btn btn-primary" onclick="App.save()">💾 Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="tab-stats" class="tab-content">
+    <div id="statsContent"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="settingsContainer"></div>
+</div>
+
+<div id="detailModalContainer"></div>
+
+<script src="shared/core.js"></script>
+<script src="shared/ui.js"></script>
+<script src="shisha.js"></script>
+</body>
+</html>
