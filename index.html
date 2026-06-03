@@ -77,6 +77,8 @@
 
   <div style="text-align:center;margin-top:3rem;padding-bottom:2rem">
     <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ Daten exportieren</button>
+    <button class="btn btn-secondary" onclick="UI.triggerImport()">⬆️ Daten importieren</button>
+    <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="UI.handleImport(event)" />
     <button class="btn btn-secondary" onclick="TJ.loadData().then(updateCounts)">🔄 Aktualisieren</button>
     <button class="btn btn-secondary" onclick="TJ.resetSetup()">🚪 Verbindung trennen</button>
   </div>
