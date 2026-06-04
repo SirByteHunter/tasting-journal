@@ -65,6 +65,8 @@ const App = {
   // ── Render: Sammlung ──────────────────────────────────────────
   populateFilters() {
     const items = TJ.getItems(this.CATEGORY);
+    if (items.length === 0) return;
+
     const brands = [...new Set(items.map(t => t.brand).filter(Boolean))].sort();
     const flavors = [...new Set(items.map(t => t.flavor).filter(Boolean))].sort();
 
@@ -76,9 +78,9 @@ const App = {
     const selectedFlavor = flavorEl.value;
 
     brandEl.innerHTML = '<option value="">Alle Marken</option>' +
-      brands.map(b => `<option value="${escapeHtml(b)}" ${b === selectedBrand ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
+      brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
     flavorEl.innerHTML = '<option value="">Alle Geschmacksrichtungen</option>' +
-      flavors.map(f => `<option value="${escapeHtml(f)}" ${f === selectedFlavor ? 'selected' : ''}>${escapeHtml(f)}</option>`).join('');
+      flavors.map(f => `<option value="${f}" ${f === selectedFlavor ? 'selected' : ''}>${escapeHtml(f)}</option>`).join('');
   },
 
   renderCollection() {
