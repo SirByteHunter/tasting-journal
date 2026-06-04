@@ -109,6 +109,13 @@
         </div>
         <button class="btn btn-secondary" onclick="UI.copyGistId()">📋 ID kopieren</button>
       </div>
+      <div class="settings-row">
+        <div>
+          <strong style="color:var(--danger)">Gist-Verbindung trennen</strong>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Token und Gist-ID von diesem Gerät entfernen. Deine Daten im Gist bleiben erhalten.</p>
+        </div>
+        <button class="btn btn-danger" onclick="TJ.resetSetup()">🚪 Trennen</button>
+      </div>
     </div>
 
     <!-- Google Drive -->
@@ -137,18 +144,6 @@
         </div>
         <button class="btn btn-secondary" onclick="migratePhotos()" id="driveMigrateBtn">📤 Fotos migrieren</button>
       </div>
-    </div>
-  </div>
-
-  <!-- ── Gefahrenzone ── -->
-  <div class="form-card" style="border-color:var(--danger)">
-    <h2 style="color:var(--danger)">⚠️ Gefahrenzone</h2>
-    <div class="settings-row">
-      <div>
-        <strong style="color:var(--danger)">Gist-Verbindung trennen</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Token und Gist-ID von diesem Gerät entfernen. Deine Daten im Gist bleiben erhalten.</p>
-      </div>
-      <button class="btn btn-danger" onclick="TJ.resetSetup()">🚪 Trennen</button>
     </div>
   </div>
 
