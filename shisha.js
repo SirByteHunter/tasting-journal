@@ -5,6 +5,28 @@
 const App = {
   CATEGORY: 'shisha',
   currentModalId: null,
+  favFilterActive: false,
+
+  toggleFavFilter() {
+    this.favFilterActive = !this.favFilterActive;
+    const btn = document.getElementById('filterFavBtn');
+    if (btn) {
+      btn.classList.toggle('active', this.favFilterActive);
+      btn.textContent = this.favFilterActive ? '♥ Favoriten' : '♡ Favoriten';
+    }
+    this.renderCollection();
+  },
+
+  async toggleFavorite(id, event) {
+    event.stopPropagation();
+    const items = TJ.getItems(this.CATEGORY);
+    const item = items.find(x => x.id === id);
+    if (!item) return;
+    item.favorite = !item.favorite;
+    TJ.saveCache();
+    await TJ.saveData();
+    this.renderCollection();
+  },
 
   FIELDS: ['name','brand','flavor','base','cut','moisture','bowl','heat',
            'date','price','weight','smoke','heatBehavior','stamina','nicotine',
@@ -93,6 +115,7 @@ const App = {
     const filterStars = document.getElementById('filterStars').value;
 
     let list = TJ.getItems(this.CATEGORY).filter(t => {
+      if (this.favFilterActive && !t.favorite) return false;
       if (query && !(
         (t.name || '').toLowerCase().includes(query) ||
         (t.brand || '').toLowerCase().includes(query) ||
@@ -120,6 +143,7 @@ const App = {
 
     container.innerHTML = '<div class="cards-grid">' + list.map(t => `
       <div class="tasting-card" onclick="App.openModal('${t.id}')">
+        <button class="fav-btn${t.favorite ? ' active' : ''}" onclick="App.toggleFavorite('${t.id}', event)" title="Favorit">${t.favorite ? '♥' : '♡'}</button>
         ${t.photo
           ? `<img class="card-img" src="${t.photo}" alt="${escapeHtml(t.name)}" />`
           : `<div class="card-img-placeholder">💨</div>`}

@@ -5,6 +5,28 @@
 const App = {
   CATEGORY: 'whisky',
   currentModalId: null,
+  favFilterActive: false,
+
+  toggleFavFilter() {
+    this.favFilterActive = !this.favFilterActive;
+    const btn = document.getElementById('filterFavBtn');
+    if (btn) {
+      btn.classList.toggle('active', this.favFilterActive);
+      btn.textContent = this.favFilterActive ? '♥ Favoriten' : '♡ Favoriten';
+    }
+    this.renderCollection();
+  },
+
+  async toggleFavorite(id, event) {
+    event.stopPropagation();
+    const items = TJ.getItems(this.CATEGORY);
+    const item = items.find(x => x.id === id);
+    if (!item) return;
+    item.favorite = !item.favorite;
+    TJ.saveCache();
+    await TJ.saveData();
+    this.renderCollection();
+  },
 
   // ── Form ───────────────────────────────────────────────────────
   resetForm() {
@@ -84,12 +106,13 @@ const App = {
     const query = document.getElementById('searchInput').value.toLowerCase();
     const sort = document.getElementById('sortSelect').value;
 
-    let list = TJ.getItems(this.CATEGORY).filter(t =>
-      (t.name || '').toLowerCase().includes(query) ||
-      (t.distillery || '').toLowerCase().includes(query) ||
-      (t.country || '').toLowerCase().includes(query) ||
-      (t.region || '').toLowerCase().includes(query)
-    );
+    let list = TJ.getItems(this.CATEGORY).filter(t => {
+      if (this.favFilterActive && !t.favorite) return false;
+      return (t.name || '').toLowerCase().includes(query) ||
+        (t.distillery || '').toLowerCase().includes(query) ||
+        (t.country || '').toLowerCase().includes(query) ||
+        (t.region || '').toLowerCase().includes(query);
+    });
 
     list.sort((a, b) => {
       if (sort === 'date-desc') return parseInt(b.id) - parseInt(a.id);
@@ -107,6 +130,7 @@ const App = {
 
     container.innerHTML = '<div class="cards-grid">' + list.map(t => `
       <div class="tasting-card" onclick="App.openModal('${t.id}')">
+        <button class="fav-btn${t.favorite ? ' active' : ''}" onclick="App.toggleFavorite('${t.id}', event)" title="Favorit">${t.favorite ? '♥' : '♡'}</button>
         ${t.photo
           ? `<img class="card-img" src="${t.photo}" alt="${escapeHtml(t.name)}" />`
           : `<div class="card-img-placeholder">🥃</div>`}
