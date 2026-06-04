@@ -103,6 +103,17 @@ header .subtitle {
 }
 .header-icon-btn:hover { border-color: var(--amber); transform: rotate(30deg); }
 
+.version-badge {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.2rem 0.5rem;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
 .sync-status {
   display: flex;
   align-items: center;

@@ -24,6 +24,7 @@
     <span class="sync-dot"></span>
     <span class="sync-text">Lade…</span>
   </div>
+  <span class="version-badge" id="versionBadge"></span>
 </header>
 
 <div id="setupContainer"></div>
@@ -150,9 +151,11 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="shared/core.js"></script>
+<script src="shared/version.js"></script>
 <script src="shared/ui.js"></script>
 <script src="shared/gdrive.js"></script>
 <script>
+  document.getElementById('versionBadge').textContent = TJ_VERSION;
   // Setup-Modal einbauen
   document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
 

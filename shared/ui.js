@@ -19,6 +19,7 @@ const UI = {
     <span class="sync-dot"></span>
     <span class="sync-text">Lade…</span>
   </div>
+  <span class="version-badge" title="Version">${typeof TJ_VERSION !== 'undefined' ? TJ_VERSION : ''}</span>
   <a href="settings.html" class="header-icon-btn" title="Einstellungen" aria-label="Einstellungen">⚙️</a>
 </header>`;
   },

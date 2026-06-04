@@ -23,6 +23,7 @@
     <span class="sync-dot"></span>
     <span class="sync-text">Lade…</span>
   </div>
+  <span class="version-badge" id="versionBadge"></span>
   <a href="settings.html" class="header-icon-btn" title="Einstellungen" aria-label="Einstellungen">⚙️</a>
 </header>
 
@@ -78,8 +79,10 @@
 </div>
 
 <script src="shared/core.js"></script>
+<script src="shared/version.js"></script>
 <script src="shared/ui.js"></script>
 <script>
+  document.getElementById('versionBadge').textContent = TJ_VERSION;
   // Setup-Modal einbauen
   document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
 
