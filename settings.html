@@ -102,9 +102,17 @@
     <div class="settings-row">
       <div>
         <strong>Daten exportieren</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei mit ALLEN Verkostungen (alle Kategorien) herunterladen. Empfohlen als regelmäßiges Backup.</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei mit ALLEN Verkostungen (alle Kategorien) herunterladen.</p>
       </div>
       <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ Download JSON</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <strong>Vollständiges Backup</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">ZIP-Datei mit allen Verkostungsdaten (JSON) und allen Fotos aus Google Drive.</p>
+        <div id="backupProgress" style="display:none;margin-top:0.5rem;font-size:0.85rem;color:var(--amber-light)"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="fullBackup()" id="backupBtn">📦 Backup herunterladen</button>
     </div>
     <div class="settings-row">
       <div>
@@ -140,12 +148,82 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="shared/core.js"></script>
 <script src="shared/ui.js"></script>
 <script src="shared/gdrive.js"></script>
 <script>
   // Setup-Modal einbauen
   document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
+
+  async function fullBackup() {
+    const btn = document.getElementById('backupBtn');
+    const progress = document.getElementById('backupProgress');
+    btn.disabled = true;
+    progress.style.display = 'block';
+
+    try {
+      const zip = new JSZip();
+      const date = new Date().toISOString().split('T')[0];
+
+      // JSON hinzufügen
+      progress.textContent = 'Verkostungsdaten werden verpackt…';
+      zip.file('tastings.json', JSON.stringify(TJ.data, null, 2));
+
+      // Fotos sammeln
+      const allItems = [...TJ.getItems('whisky'), ...TJ.getItems('shisha')];
+      const driveItems = allItems.filter(t => t.photo && t.photo.includes('drive.google.com'));
+      const base64Items = allItems.filter(t => t.photo && t.photo.startsWith('data:'));
+
+      const photosFolder = zip.folder('fotos');
+      let done = 0;
+      const total = driveItems.length + base64Items.length;
+
+      // Drive-Fotos herunterladen
+      for (const item of driveItems) {
+        progress.textContent = `Fotos herunterladen… ${done + 1} / ${total}`;
+        try {
+          const res = await fetch(item.photo);
+          if (res.ok) {
+            const blob = await res.blob();
+            const ext = blob.type.includes('png') ? 'png' : 'jpg';
+            photosFolder.file(`${item.id}.${ext}`, blob);
+          }
+        } catch (e) {
+          console.warn('Foto konnte nicht geladen werden:', item.id, e);
+        }
+        done++;
+      }
+
+      // Base64-Fotos direkt einpacken
+      for (const item of base64Items) {
+        progress.textContent = `Fotos verpacken… ${done + 1} / ${total}`;
+        const [header, data] = item.photo.split(',');
+        const ext = header.includes('png') ? 'png' : 'jpg';
+        photosFolder.file(`${item.id}.${ext}`, data, { base64: true });
+        done++;
+      }
+
+      // ZIP generieren und herunterladen
+      progress.textContent = 'ZIP wird erstellt…';
+      const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tasting-journal-backup-${date}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      progress.textContent = `✅ Backup fertig – ${total} Fotos + JSON`;
+      TJ.notify('✅ Backup heruntergeladen', 'success');
+    } catch (e) {
+      console.error(e);
+      progress.textContent = '❌ Fehler: ' + e.message;
+      TJ.notify('❌ Backup fehlgeschlagen: ' + e.message, 'error');
+    }
+
+    btn.disabled = false;
+  }
 
   function updateDriveUI() {
     const connected = GDrive.isConnected();
