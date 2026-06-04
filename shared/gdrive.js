@@ -112,16 +112,24 @@ const GDrive = {
   async ensureToken() {
     if (this.loadToken()) return this.token;  // Token noch gültig
 
-    // Kein gültiger Token — silent refresh versuchen
     if (!localStorage.getItem(this.TOKEN_KEY)) {
       throw new Error('Nicht mit Google Drive verbunden');
     }
+
+    // Erst silent refresh versuchen
     try {
       await this.silentRefresh();
+      if (this.token) return this.token;
+    } catch (e) {
+      // Silent refresh fehlgeschlagen (z.B. Safari ITP) → Popup-Login
+    }
+
+    // Fallback: Popup-Login (sichtbar für User, aber automatisch ausgelöst)
+    try {
+      await this.login();
       return this.token;
     } catch (e) {
-      // Silent refresh fehlgeschlagen → Popup-Login nötig
-      throw new Error('Google Drive Sitzung abgelaufen – bitte neu verbinden');
+      throw new Error('Google Drive Sitzung abgelaufen – bitte manuell neu verbinden');
     }
   },
 
