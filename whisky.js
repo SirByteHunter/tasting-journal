@@ -243,7 +243,7 @@ const App = {
           </div>
         </div>
       </div>
-      <div class="form-card">
+      <div class="form-card" style="margin-bottom:1.5rem">
         <h2>Nach Herkunft</h2>
         <div style="margin-top:1rem">
           ${Object.entries(byCountry).sort((a,b)=>b[1]-a[1]).map(([c,n]) => `
@@ -253,6 +253,25 @@ const App = {
                 <div style="height:100%;width:${Math.round(n/items.length*100)}%;background:linear-gradient(90deg,var(--amber-dark),var(--amber));border-radius:20px"></div>
               </div>
               <span style="color:var(--amber-light);min-width:2ch">${n}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="form-card">
+        <h2>🏆 Top 10</h2>
+        <div style="margin-top:1rem">
+          ${[...items].sort((a,b) => (b.score||0) - (a.score||0)).slice(0,10).map((t,i) => `
+            <div onclick="App.openModal('${t.id}')" style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;cursor:pointer;padding:0.5rem;border-radius:8px;transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+              <div style="min-width:1.8rem;font-size:1.1rem;font-weight:bold;color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text-muted)'};text-align:center">${i+1}</div>
+              ${t.photo ? `<img src="${t.photo}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0" />` : `<div style="width:40px;height:40px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🥃</div>`}
+              <div style="flex:1;min-width:0">
+                <div style="color:var(--amber-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(t.name)}</div>
+                <div style="color:var(--text-muted);font-size:0.8rem">${escapeHtml(t.distillery||'')}${t.country?' · '+escapeHtml(t.country):''}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0">
+                <span class="score-badge">${t.score}</span>
+                ${t.favorite ? '<span style="color:#e05575">♥</span>' : ''}
+              </div>
             </div>
           `).join('')}
         </div>
