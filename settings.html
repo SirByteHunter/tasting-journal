@@ -180,6 +180,12 @@
       const total = driveItems.length + base64Items.length;
 
       // Drive-Fotos herunterladen
+      if (driveItems.length > 0 && !GDrive.isConnected()) {
+        progress.textContent = '⚠️ Google Drive Token abgelaufen – bitte neu verbinden und erneut versuchen';
+        btn.disabled = false;
+        return;
+      }
+
       for (const item of driveItems) {
         progress.textContent = `Fotos herunterladen… ${done + 1} / ${total}`;
         try {
@@ -187,7 +193,9 @@
           const ext = blob.type.includes('png') ? 'png' : 'jpg';
           photosFolder.file(`${item.id}.${ext}`, blob);
         } catch (e) {
-          console.warn('Foto konnte nicht geladen werden:', item.id, e);
+          console.error('Foto fehlgeschlagen:', item.id, item.photo, e);
+          progress.textContent = `⚠️ Fehler bei Foto ${done + 1}: ${e.message}`;
+          await new Promise(r => setTimeout(r, 1500));
         }
         done++;
       }
