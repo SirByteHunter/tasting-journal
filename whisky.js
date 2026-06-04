@@ -308,9 +308,7 @@ document.getElementById('detailModal').addEventListener('click', e => {
 document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 
 function onDataLoaded() {
-  const activeTab = document.querySelector('.tab-btn.active');
-  const tab = activeTab ? activeTab.dataset.tab : 'collection';
-  App.onTabSwitch(tab);
+  App.onTabSwitch(App._activeTab || 'collection');
 }
 function onSetupComplete() { App.renderCollection(); }
 
