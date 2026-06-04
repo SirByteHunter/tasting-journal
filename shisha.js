@@ -344,6 +344,7 @@ document.getElementById('detailModal').addEventListener('click', e => {
 document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 
 function onDataLoaded() {
+  UI.updateHeaderTitle('Shisha-Tabak');
   if (typeof App !== 'undefined') App.onTabSwitch(App._activeTab || 'collection');
 }
 function onSetupComplete() { App.renderCollection(); }

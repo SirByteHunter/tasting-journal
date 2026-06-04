@@ -11,10 +11,22 @@ const TJ = {
 
   token: null,
   gistId: null,
-  data: { whisky: [], shisha: [] },  // alle Kategorien
+  data: { meta: {}, whisky: [], shisha: [] },
   isDirty: false,
   saveTimer: null,
-  currentCategory: null,  // wird von der jeweiligen Seite gesetzt
+  currentCategory: null,
+
+  // ── Nutzername ─────────────────────────────────────────────────
+  getUsername() {
+    return (this.data.meta && this.data.meta.username) || '';
+  },
+
+  async setUsername(name) {
+    if (!this.data.meta) this.data.meta = {};
+    this.data.meta.username = name.trim();
+    this.saveCache();
+    await this.saveData();
+  },
 
   // ── Sync-Status ────────────────────────────────────────────────
   setSyncStatus(state, text) {
@@ -60,7 +72,7 @@ const TJ = {
   },
 
   async createGist() {
-    const initial = { whisky: [], shisha: [] };
+    const initial = { meta: {}, whisky: [], shisha: [] };
     const data = await this.ghFetch('https://api.github.com/gists', {
       method: 'POST',
       body: JSON.stringify({
@@ -97,6 +109,7 @@ const TJ = {
       parsed = { whisky: parsed, shisha: [] };
     }
     // Sicherstellen, dass alle Kategorien existieren
+    if (!parsed.meta) parsed.meta = {};
     if (!parsed.whisky) parsed.whisky = [];
     if (!parsed.shisha) parsed.shisha = [];
     return parsed;
@@ -117,6 +130,7 @@ const TJ = {
   async setupComplete() {
     const newToken = document.getElementById('setupToken').value.trim();
     const newGistId = document.getElementById('setupGistId').value.trim();
+    const newUsername = (document.getElementById('setupUsername').value || '').trim();
 
     if (!newToken) {
       this.notify('Bitte Token eingeben', 'error');
@@ -151,7 +165,13 @@ const TJ = {
 
       this.notify('✅ Verbindung hergestellt – Gist-ID: ' + this.gistId.substring(0, 8) + '…', 'success');
       await this.loadData();
-      // Callback: jede Seite kann eigene Logik nach Setup ausführen
+      // Namen speichern wenn angegeben
+      if (newUsername) {
+        if (!this.data.meta) this.data.meta = {};
+        this.data.meta.username = newUsername;
+        this.saveCache();
+        await this.saveData();
+      }
       if (typeof onSetupComplete === 'function') onSetupComplete();
     } catch (e) {
       console.error(e);
@@ -184,10 +204,11 @@ const TJ = {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed)) {
-          this.data = { whisky: parsed, shisha: [] };
+          this.data = { meta: {}, whisky: parsed, shisha: [] };
         } else {
           this.data = parsed;
         }
+        if (!this.data.meta) this.data.meta = {};
         if (!this.data.whisky) this.data.whisky = [];
         if (!this.data.shisha) this.data.shisha = [];
       } catch (e) {

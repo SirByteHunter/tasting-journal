@@ -7,12 +7,13 @@ const UI = {
   // ── Header (kategorie-spezifisch) ──────────────────────────────
   renderHeader(opts) {
     const { icon, title, subtitle, accent, isHome } = opts;
+    const username = (typeof TJ !== 'undefined' && TJ.getUsername()) ? TJ.getUsername() + 's ' : '';
     return `
 <header class="cat-${accent}">
   ${isHome ? '' : '<a href="index.html" class="back-link" title="Zur Übersicht">←</a>'}
   <div class="glass-icon">${icon}</div>
   <div class="header-text">
-    <h1>${escapeHtml(title)}</h1>
+    <h1>${escapeHtml(username)}${escapeHtml(title)}</h1>
     <div class="subtitle">${escapeHtml(subtitle)}</div>
   </div>
   <div class="sync-status" id="syncStatus" title="Sync-Status">
@@ -38,6 +39,15 @@ const UI = {
       <div class="setup-step">
         <div class="step-num">1</div>
         <div class="step-content">
+          <strong>Dein Name</strong>
+          <p>Wie soll dein Tasting Journal heißen? Der Name wird in der App angezeigt.</p>
+          <input type="text" id="setupUsername" placeholder="z.B. Heinrich" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
           <strong>GitHub Personal Access Token erstellen</strong>
           <p>Klicke auf den folgenden Link – die Berechtigungen sind bereits voreingestellt:</p>
           <a href="https://github.com/settings/tokens/new?description=Tasting%20Journal&scopes=gist" target="_blank" class="btn btn-primary" style="margin-top:0.5rem;display:inline-block;text-decoration:none">
@@ -48,7 +58,7 @@ const UI = {
       </div>
 
       <div class="setup-step">
-        <div class="step-num">2</div>
+        <div class="step-num">3</div>
         <div class="step-content">
           <strong>Token hier einfügen</strong>
           <input type="password" id="setupToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
@@ -56,7 +66,7 @@ const UI = {
       </div>
 
       <div class="setup-step">
-        <div class="step-num">3</div>
+        <div class="step-num">4</div>
         <div class="step-content">
           <strong>Gist-ID (optional)</strong>
           <p>Wenn du bereits einen Gist hast (z.B. weil du auf einem anderen Gerät schon eingerichtet hast), füge die Gist-ID hier ein. Lass das Feld leer, um einen neuen Gist anzulegen.</p>
@@ -197,6 +207,13 @@ const UI = {
       preview.src = '';
       hint.style.display = 'block';
     }
+  },
+
+  updateHeaderTitle(title) {
+    const h1 = document.querySelector('header h1');
+    if (!h1) return;
+    const username = (typeof TJ !== 'undefined' && TJ.getUsername()) ? TJ.getUsername() + 's ' : '';
+    h1.textContent = username + title;
   },
 
   // ── Tab-Switching ──────────────────────────────────────────────
