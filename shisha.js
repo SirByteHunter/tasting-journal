@@ -7,7 +7,7 @@ const App = {
   currentModalId: null,
 
   FIELDS: ['name','brand','flavor','base','cut','moisture','bowl','heat',
-           'date','price','smoke','heatBehavior','stamina','nicotine',
+           'date','price','weight','smoke','heatBehavior','stamina','nicotine',
            'taste','draw','notes'],
 
   // ── Form ───────────────────────────────────────────────────────
@@ -129,6 +129,8 @@ const App = {
           <div class="card-meta">
             ${t.flavor ? `<span class="badge accent">${escapeHtml(t.flavor)}</span>` : ''}
             ${t.base ? `<span class="badge">${escapeHtml(t.base)}</span>` : ''}
+            ${t.weight ? `<span class="badge">${escapeHtml(t.weight)} g</span>` : ''}
+            ${t.price && t.weight ? `<span class="badge">${(parseFloat(t.price)/parseFloat(t.weight)).toFixed(2)} €/g</span>` : ''}
             ${t.smoke ? `<span class="badge">💨 ${escapeHtml(t.smoke)}</span>` : ''}
             ${t.nicotine ? `<span class="badge">N: ${escapeHtml(t.nicotine)}</span>` : ''}
           </div>
@@ -164,7 +166,9 @@ const App = {
     if (t.heatBehavior) html += this.detail('Hitze-Verhalten', escapeHtml(t.heatBehavior));
     if (t.stamina) html += this.detail('Durchhaltevermögen', escapeHtml(t.stamina));
     if (t.nicotine) html += this.detail('Nikotinstärke', escapeHtml(t.nicotine));
-    if (t.price) html += this.detail('Preis', escapeHtml(t.price) + ' €');
+    if (t.price) html += this.detail('Preis', escapeHtml(t.price) + ' €' +
+      (t.weight ? ` <span style="color:var(--text-muted);font-size:0.85rem">(${(parseFloat(t.price) / parseFloat(t.weight)).toFixed(2)} €/g)</span>` : ''));
+    if (t.weight) html += this.detail('Verpackungsgröße', escapeHtml(t.weight) + ' g');
     if (t.date) html += this.detail('Verkostet am', formatDate(t.date));
     html += this.detail('Bewertung',
       `<span class="score-badge">${t.score}/100</span> &nbsp; <span class="stars-display">${starsHtml(t.stars)}</span>`);
