@@ -144,17 +144,6 @@
           <input type="number" id="f-weight" placeholder="z.B. 200" min="0" step="1" />
         </div>
         <div class="form-group">
-          <label>Punktzahl (0–100)</label>
-          <div class="score-wrap">
-            <input type="range" id="f-score" min="0" max="100" value="80" oninput="document.getElementById('scoreVal').textContent=this.value" />
-            <span class="score-val" id="scoreVal">80</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Sterne (1–5)</label>
-          <div id="starPickerContainer"></div>
-        </div>
-        <div class="form-group">
           <label>Rauchentwicklung</label>
           <select id="f-smoke">
             <option value="">— Bitte wählen —</option>
@@ -206,6 +195,17 @@
         <div class="form-group full">
           <label>Persönliche Notizen</label>
           <textarea id="f-notes" placeholder="Mix-Empfehlungen, Anlass, Vergleiche…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Punktzahl (0–100)</label>
+          <div class="score-wrap">
+            <input type="range" id="f-score" min="0" max="100" value="80" oninput="document.getElementById('scoreVal').textContent=this.value" />
+            <span class="score-val" id="scoreVal">80</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sterne (1–5)</label>
+          <div id="starPickerContainer"></div>
         </div>
         <div class="form-group full">
           <label>Foto vom Tabak / Verpackung</label>
