@@ -202,6 +202,22 @@ const GDrive = {
     return `https://drive.google.com/thumbnail?id=${file.id}&sz=w1024`;
   },
 
+  // ── Foto herunterladen (über API mit Auth-Token) ───────────────
+  async downloadPhoto(url) {
+    this.loadToken();
+    // File-ID aus der URL extrahieren
+    const match = url.match(/[?&]id=([^&]+)/);
+    if (!match) throw new Error('Keine File-ID in URL: ' + url);
+    const fileId = match[1];
+
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+      { headers: { 'Authorization': 'Bearer ' + this.token } }
+    );
+    if (!res.ok) throw new Error('Download fehlgeschlagen: ' + res.status);
+    return res.blob();
+  },
+
   // ── Foto löschen ───────────────────────────────────────────────
   async deletePhoto(url) {
     const match = url.match(/[?&]id=([^&]+)/);

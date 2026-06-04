@@ -183,12 +183,9 @@
       for (const item of driveItems) {
         progress.textContent = `Fotos herunterladen… ${done + 1} / ${total}`;
         try {
-          const res = await fetch(item.photo);
-          if (res.ok) {
-            const blob = await res.blob();
-            const ext = blob.type.includes('png') ? 'png' : 'jpg';
-            photosFolder.file(`${item.id}.${ext}`, blob);
-          }
+          const blob = await GDrive.downloadPhoto(item.photo);
+          const ext = blob.type.includes('png') ? 'png' : 'jpg';
+          photosFolder.file(`${item.id}.${ext}`, blob);
         } catch (e) {
           console.warn('Foto konnte nicht geladen werden:', item.id, e);
         }
