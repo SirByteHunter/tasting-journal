@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1a0f05" />
+  <title>Kaffee – Tasting Journal</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="stylesheet" href="shared/styles.css" />
+</head>
+<body class="cat-kaffee">
+
+<div id="headerContainer"></div>
+<div id="setupContainer"></div>
+
+<div class="container" id="appContent" style="display:none">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="collection" onclick="UI.switchTab('collection')">Verkostungen</button>
+    <button class="tab-btn" data-tab="add" onclick="UI.switchTab('add')">+ Neue</button>
+    <button class="tab-btn" data-tab="stats" onclick="UI.switchTab('stats')">Statistiken</button>
+    <button class="tab-btn" data-tab="settings" onclick="UI.switchTab('settings')">⚙️</button>
+  </div>
+
+  <!-- COLLECTION -->
+  <div id="tab-collection" class="tab-content active">
+    <div class="collection-header">
+      <h2>Alle Verkostungen</h2>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Suchen…" oninput="App.renderCollection()" />
+        <select class="sort-select" id="sortSelect" onchange="App.renderCollection()">
+          <option value="date-desc">Neueste zuerst</option>
+          <option value="date-asc">Älteste zuerst</option>
+          <option value="score-desc">Beste Bewertung</option>
+          <option value="name-asc">Name A–Z</option>
+        </select>
+        <button class="filter-fav-btn" id="filterFavBtn" onclick="App.toggleFavFilter()">♡ Favoriten</button>
+      </div>
+      <div class="search-bar" style="margin-top:0.5rem">
+        <select class="sort-select" id="filterRoastery" onchange="App.renderCollection()">
+          <option value="">Alle Röstereien</option>
+        </select>
+        <select class="sort-select" id="filterOrigin" onchange="App.renderCollection()">
+          <option value="">Alle Herkunftsländer</option>
+        </select>
+        <select class="sort-select" id="filterMachine" onchange="App.renderCollection()">
+          <option value="">Alle Maschinen</option>
+        </select>
+      </div>
+    </div>
+    <div id="cardsContainer"></div>
+  </div>
+
+  <!-- ADD / EDIT FORM -->
+  <div id="tab-add" class="tab-content">
+    <div class="form-card">
+      <h2 id="formTitle">Neue Kaffee-Verkostung</h2>
+      <input type="hidden" id="editId" />
+      <div class="form-grid">
+
+        <!-- Bohne -->
+        <div class="form-group full" style="margin-bottom:0.25rem">
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Bohne</label>
+        </div>
+        <div class="form-group">
+          <label>Name / Bezeichnung *</label>
+          <input type="text" id="f-name" placeholder="z.B. Ethiopia Yirgacheffe" />
+        </div>
+        <div class="form-group">
+          <label>Rösterei</label>
+          <input type="text" id="f-roastery" placeholder="z.B. Five Elephant, Bonanza" />
+        </div>
+        <div class="form-group">
+          <label>Herkunftsland</label>
+          <select id="f-origin">
+            <option value="">— Bitte wählen —</option>
+            <option>Äthiopien</option>
+            <option>Brasilien</option>
+            <option>Kolumbien</option>
+            <option>Guatemala</option>
+            <option>Honduras</option>
+            <option>Costa Rica</option>
+            <option>Panama</option>
+            <option>Peru</option>
+            <option>Kenia</option>
+            <option>Ruanda</option>
+            <option>Uganda</option>
+            <option>Tansania</option>
+            <option>Indonesien</option>
+            <option>Vietnam</option>
+            <option>Indien</option>
+            <option>Jamaika</option>
+            <option>Yemen</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Region / Farm</label>
+          <input type="text" id="f-region" placeholder="z.B. Sidamo, Huila" />
+        </div>
+        <div class="form-group">
+          <label>Röstgrad</label>
+          <select id="f-roast">
+            <option value="">— Bitte wählen —</option>
+            <option>Hell</option>
+            <option>Hell-Mittel</option>
+            <option>Mittel</option>
+            <option>Mittel-Dunkel</option>
+            <option>Dunkel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Verarbeitung</label>
+          <select id="f-process">
+            <option value="">— Bitte wählen —</option>
+            <option>Washed</option>
+            <option>Natural</option>
+            <option>Honey</option>
+            <option>Anaerobic</option>
+            <option>Wet Hulled</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Verkostungsdatum</label>
+          <input type="date" id="f-date" />
+        </div>
+        <div class="form-group">
+          <label>Preis (€)</label>
+          <input type="number" id="f-price" placeholder="z.B. 14.50" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label>Gewicht (g)</label>
+          <input type="number" id="f-weight" placeholder="z.B. 250" min="0" step="1" />
+        </div>
+
+        <!-- Zubereitung -->
+        <div class="form-group full" style="margin-top:0.75rem;margin-bottom:0.25rem">
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Zubereitung</label>
+        </div>
+        <div class="form-group">
+          <label>Maschine</label>
+          <select id="f-machine">
+            <option value="">— Bitte wählen —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mahlgrad</label>
+          <input type="text" id="f-grind" placeholder="z.B. 15 (Comandante)" />
+        </div>
+        <div class="form-group">
+          <label>Kaffeemenge (g)</label>
+          <input type="number" id="f-dose" placeholder="z.B. 18" min="0" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>Bezugszeit (sek)</label>
+          <input type="number" id="f-time" placeholder="z.B. 28" min="0" step="1" />
+        </div>
+        <div class="form-group">
+          <label>Wassermenge (ml)</label>
+          <input type="number" id="f-water" placeholder="z.B. 36" min="0" step="1" />
+        </div>
+        <div class="form-group">
+          <label>Wassertemperatur (°C)</label>
+          <input type="number" id="f-temp" placeholder="z.B. 93" min="0" max="100" step="1" />
+        </div>
+
+        <!-- Verkostung -->
+        <div class="form-group full" style="margin-top:0.75rem;margin-bottom:0.25rem">
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Verkostung</label>
+        </div>
+        <div class="form-group full">
+          <label>Aroma</label>
+          <textarea id="f-aroma" placeholder="Erste Geruchseindrücke…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Geschmack</label>
+          <textarea id="f-taste" placeholder="Säure, Süße, Bitterkeit, Körper, Textur…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Abgang</label>
+          <textarea id="f-finish" placeholder="Länge und Nachklang…"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Persönliche Notizen</label>
+          <textarea id="f-notes" placeholder="Anlass, Vergleiche, nächste Anpassungen…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Punktzahl (0–100)</label>
+          <div class="score-wrap">
+            <input type="range" id="f-score" min="0" max="100" value="80" oninput="document.getElementById('scoreVal').textContent=this.value" />
+            <span class="score-val" id="scoreVal">80</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sterne (1–5)</label>
+          <div id="starPickerContainer"></div>
+        </div>
+        <div class="form-group full">
+          <label>Foto der Verpackung / Bohnen</label>
+          <div id="photoUploadContainer"></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="App.resetForm()">Zurücksetzen</button>
+        <button class="btn btn-primary" onclick="App.save()">💾 Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="tab-stats" class="tab-content">
+    <div id="statsContent"></div>
+  </div>
+
+  <!-- SETTINGS (kategoriespezifisch) -->
+  <div id="settingsContainer"></div>
+</div>
+
+<div id="detailModalContainer"></div>
+
+<script src="shared/core.js"></script>
+<script src="shared/version.js"></script>
+<script src="shared/gdrive.js"></script>
+<script src="shared/ui.js"></script>
+<script src="kaffee.js"></script>
+</body>
+</html>

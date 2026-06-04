@@ -62,6 +62,10 @@
         <div class="stat-value" id="shishaCount">0</div>
         <div class="stat-label">Shisha</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-value" id="kaffeeCount">0</div>
+        <div class="stat-label">Kaffee</div>
+      </div>
     </div>
     <div class="settings-row">
       <div>
@@ -174,7 +178,7 @@
       zip.file('tastings.json', JSON.stringify(TJ.data, null, 2));
 
       // Fotos sammeln
-      const allItems = [...TJ.getItems('whisky'), ...TJ.getItems('shisha')];
+      const allItems = [...TJ.getItems('whisky'), ...TJ.getItems('shisha'), ...TJ.getItems('kaffee')];
       const driveItems = allItems.filter(t => t.photo && t.photo.includes('drive.google.com'));
       const base64Items = allItems.filter(t => t.photo && t.photo.startsWith('data:'));
 
@@ -337,9 +341,11 @@
   function updateCounts() {
     const w = TJ.getItems('whisky').length;
     const s = TJ.getItems('shisha').length;
+    const k = TJ.getItems('kaffee').length;
     document.getElementById('whiskyCount').textContent = w;
     document.getElementById('shishaCount').textContent = s;
-    document.getElementById('totalCount').textContent = w + s;
+    document.getElementById('kaffeeCount').textContent = k;
+    document.getElementById('totalCount').textContent = w + s + k;
   }
 
   function renderConnectionInfo() {

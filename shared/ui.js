@@ -304,7 +304,7 @@ const UI = {
       }
 
       // Sicherstellen, dass Kategorien existieren und Arrays sind
-      const categories = ['whisky', 'shisha'];
+      const categories = ['whisky', 'shisha', 'kaffee'];
       const counts = {};
       for (const cat of categories) {
         if (!parsed[cat]) parsed[cat] = [];

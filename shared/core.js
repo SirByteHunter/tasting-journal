@@ -11,7 +11,7 @@ const TJ = {
 
   token: null,
   gistId: null,
-  data: { meta: {}, whisky: [], shisha: [] },
+  data: { meta: {}, whisky: [], shisha: [], kaffee: [] },
   isDirty: false,
   saveTimer: null,
   currentCategory: null,
@@ -112,6 +112,7 @@ const TJ = {
     if (!parsed.meta) parsed.meta = {};
     if (!parsed.whisky) parsed.whisky = [];
     if (!parsed.shisha) parsed.shisha = [];
+    if (!parsed.kaffee) parsed.kaffee = [];
     return parsed;
   },
 
@@ -204,13 +205,14 @@ const TJ = {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed)) {
-          this.data = { meta: {}, whisky: parsed, shisha: [] };
+          this.data = { meta: {}, whisky: parsed, shisha: [], kaffee: [] };
         } else {
           this.data = parsed;
         }
         if (!this.data.meta) this.data.meta = {};
         if (!this.data.whisky) this.data.whisky = [];
         if (!this.data.shisha) this.data.shisha = [];
+        if (!this.data.kaffee) this.data.kaffee = [];
       } catch (e) {
         this.data = { whisky: [], shisha: [] };
       }

@@ -28,6 +28,20 @@ body.cat-shisha {
   --card: #1f1640;
 }
 
+/* Kaffee-Theme */
+body.cat-kaffee {
+  --amber: #a0522d;
+  --amber-dark: #6f3a1e;
+  --amber-light: #d4956a;
+  --bg: #1a0f05;
+  --bg2: #26180a;
+  --bg3: #33200f;
+  --text: #f0e0d0;
+  --text-muted: #a08070;
+  --border: #4a2e18;
+  --card: #2a1808;
+}
+
 /* Übersicht / Index */
 body.cat-home {
   --amber: #d4af37;

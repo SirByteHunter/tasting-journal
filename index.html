@@ -51,6 +51,13 @@
       <div class="cat-count" id="count-shisha">0 Verkostungen</div>
     </a>
 
+    <a href="kaffee.html" class="category-card" data-cat="kaffee">
+      <div class="cat-icon">☕</div>
+      <h2>Kaffee</h2>
+      <div class="cat-desc">Espresso, Filter & Spezialitäten<br>vom Siebträger</div>
+      <div class="cat-count" id="count-kaffee">0 Verkostungen</div>
+    </a>
+
     <div class="category-card coming-soon" data-cat="cigar">
       <div class="cat-icon">🚬</div>
       <h2>Zigarren</h2>
@@ -95,17 +102,21 @@
   function updateCounts() {
     const whiskyCount = TJ.getItems('whisky').length;
     const shishaCount = TJ.getItems('shisha').length;
-    const total = whiskyCount + shishaCount;
+    const kaffeeCount = TJ.getItems('kaffee').length;
+    const total = whiskyCount + shishaCount + kaffeeCount;
 
     document.getElementById('count-whisky').textContent =
       whiskyCount === 1 ? '1 Verkostung' : `${whiskyCount} Verkostungen`;
     document.getElementById('count-shisha').textContent =
       shishaCount === 1 ? '1 Verkostung' : `${shishaCount} Verkostungen`;
+    document.getElementById('count-kaffee').textContent =
+      kaffeeCount === 1 ? '1 Verkostung' : `${kaffeeCount} Verkostungen`;
     document.getElementById('totalCount').textContent = total;
 
     let activeCats = 0;
     if (whiskyCount > 0) activeCats++;
     if (shishaCount > 0) activeCats++;
+    if (kaffeeCount > 0) activeCats++;
     document.getElementById('categoryCount').textContent = activeCats;
   }
 
