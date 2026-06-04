@@ -32,7 +32,7 @@
 
 <div class="container" id="appContent" style="display:none">
   <div class="home-hero">
-    <h1>Was darf's heute sein?</h1>
+    <h1 id="heroGreeting">Was darf's heute sein?</h1>
     <p>Wähle eine Kategorie, um deine Verkostung zu dokumentieren.</p>
   </div>
 
@@ -86,6 +86,12 @@
   // Setup-Modal einbauen
   document.getElementById('setupContainer').innerHTML = UI.renderSetupModal();
 
+  function updateGreeting() {
+    const name = TJ.getUsername();
+    const el = document.getElementById('heroGreeting');
+    if (el) el.textContent = name ? `Hallo ${name}, was darf's heute sein?` : `Was darf's heute sein?`;
+  }
+
   function updateCounts() {
     const whiskyCount = TJ.getItems('whisky').length;
     const shishaCount = TJ.getItems('shisha').length;
@@ -103,8 +109,8 @@
     document.getElementById('categoryCount').textContent = activeCats;
   }
 
-  function onDataLoaded() { updateCounts(); }
-  function onSetupComplete() { updateCounts(); }
+  function onDataLoaded() { updateCounts(); updateGreeting(); }
+  function onSetupComplete() { updateCounts(); updateGreeting(); }
 
   TJ.init('home');
 </script>
