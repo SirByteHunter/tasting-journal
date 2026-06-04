@@ -8,13 +8,18 @@
   const token = params.get('access_token');
   const expiresIn = parseInt(params.get('expires_in') || '3600');
   const error = params.get('error');
+  const msg = token
+    ? { type: 'gdrive-token', token, expiresIn }
+    : { type: 'gdrive-error', error: error || 'Unbekannter Fehler' };
 
-  if (token) {
-    window.opener.postMessage({ type: 'gdrive-token', token, expiresIn }, window.location.origin);
-  } else {
-    window.opener.postMessage({ type: 'gdrive-error', error: error || 'Unbekannter Fehler' }, window.location.origin);
+  if (window.opener) {
+    // Popup-Login
+    window.opener.postMessage(msg, window.location.origin);
+    window.close();
+  } else if (window.parent && window.parent !== window) {
+    // Silent-Refresh via Hidden-Iframe
+    window.parent.postMessage(msg, window.location.origin);
   }
-  window.close();
 </script>
 </body>
 </html>
