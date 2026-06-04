@@ -317,6 +317,7 @@ const App = {
   },
 
   onTabSwitch(name) {
+    App._activeTab = name;
     if (name === 'collection') this.renderCollection();
     if (name === 'stats') this.renderStats();
     if (name === 'settings') UI.renderSettingsContent();
