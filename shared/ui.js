@@ -139,7 +139,7 @@ const UI = {
     <div style="font-size:2rem">📷</div>
     <div class="photo-hint">Klicken oder Foto auswählen</div>
     <div class="photo-hint" style="font-size:0.75rem;margin-top:0.3rem" id="photoHintSub">
-      ${window.GDrive && GDrive.isConnected() ? 'Wird in Google Drive gespeichert' : 'Wird lokal komprimiert gespeichert'}
+      ${typeof GDrive !== 'undefined' && GDrive.isConnected() ? 'Wird in Google Drive gespeichert' : 'Wird lokal komprimiert gespeichert'}
     </div>
   </div>
   <div id="photoUploading" style="display:none;text-align:center;padding:1rem">
@@ -162,7 +162,7 @@ const UI = {
     const compressed = await compressImage(file);
     preview.src = compressed;
 
-    if (window.GDrive && GDrive.isConnected()) {
+    if (typeof GDrive !== 'undefined' && GDrive.isConnected()) {
       hint.style.display = 'none';
       uploading.style.display = 'block';
       preview.style.display = 'none';

@@ -238,7 +238,7 @@
   }
 
   function updateDriveUI() {
-    const connected = GDrive.isConnected();
+    const connected = typeof GDrive !== 'undefined' && GDrive.isConnected();
     const status = document.getElementById('driveStatus');
     const connectRow = document.getElementById('driveConnectRow');
     const disconnectRow = document.getElementById('driveDisconnectRow');
@@ -248,8 +248,7 @@
       status.innerHTML = `<div style="color:#4caf50;font-size:0.9rem">✅ Verbunden – Fotos werden in Google Drive gespeichert</div>`;
       connectRow.style.display = 'none';
       disconnectRow.style.display = '';
-      // Migrieren-Button nur zeigen wenn Base64-Fotos vorhanden
-      const hasBase64 = [...TJ.getItems('whisky'), ...TJ.getItems('shisha')]
+      const hasBase64 = [...TJ.getItems('whisky'), ...TJ.getItems('shisha'), ...TJ.getItems('kaffee')]
         .some(t => t.photo && t.photo.startsWith('data:'));
       migrateRow.style.display = hasBase64 ? '' : 'none';
     } else {
@@ -266,7 +265,7 @@
     btn.disabled = true;
     progress.style.display = 'block';
 
-    const categories = ['whisky', 'shisha'];
+    const categories = ['whisky', 'shisha', 'kaffee'];
     let total = 0, done = 0, errors = 0;
 
     // Zählen
