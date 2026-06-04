@@ -1,1 +1,1 @@
-const TJ_VERSION = '1.3.3';
+const TJ_VERSION = '1.3.4';

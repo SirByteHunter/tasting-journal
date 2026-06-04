@@ -206,7 +206,7 @@ const UI = {
     document.getElementById('tab-' + name).classList.add('active');
     const btn = document.querySelector(`[data-tab="${name}"]`);
     if (btn) btn.classList.add('active');
-    if (window.App && App.onTabSwitch) App.onTabSwitch(name);
+    if (typeof App !== 'undefined' && App.onTabSwitch) App.onTabSwitch(name);
   },
 
   // ── Kategorie-Settings-Tab ─────────────────────────────────────
