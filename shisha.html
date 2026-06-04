@@ -18,7 +18,7 @@
 
 <div class="container" id="appContent" style="display:none">
   <div class="tabs">
-    <button class="tab-btn active" data-tab="collection" onclick="UI.switchTab('collection')">Sammlung</button>
+    <button class="tab-btn active" data-tab="collection" onclick="UI.switchTab('collection')">Verkostungen</button>
     <button class="tab-btn" data-tab="add" onclick="UI.switchTab('add')">+ Neue</button>
     <button class="tab-btn" data-tab="stats" onclick="UI.switchTab('stats')">Statistiken</button>
     <button class="tab-btn" data-tab="settings" onclick="UI.switchTab('settings')">⚙️</button>
@@ -27,7 +27,7 @@
   <!-- COLLECTION -->
   <div id="tab-collection" class="tab-content active">
     <div class="collection-header">
-      <h2>Alle Tabaksorten</h2>
+      <h2>Alle Verkostungen</h2>
       <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Suchen…" oninput="App.renderCollection()" />
         <select class="sort-select" id="sortSelect" onchange="App.renderCollection()">
@@ -35,6 +35,22 @@
           <option value="date-asc">Älteste zuerst</option>
           <option value="score-desc">Beste Bewertung</option>
           <option value="name-asc">Name A–Z</option>
+        </select>
+      </div>
+      <div class="search-bar" style="margin-top:0.5rem">
+        <select class="sort-select" id="filterBrand" onchange="App.renderCollection()">
+          <option value="">Alle Marken</option>
+        </select>
+        <select class="sort-select" id="filterFlavor" onchange="App.renderCollection()">
+          <option value="">Alle Geschmacksrichtungen</option>
+        </select>
+        <select class="sort-select" id="filterStars" onchange="App.renderCollection()">
+          <option value="">Alle Bewertungen</option>
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★☆</option>
+          <option value="3">★★★☆☆</option>
+          <option value="2">★★☆☆☆</option>
+          <option value="1">★☆☆☆☆</option>
         </select>
       </div>
     </div>

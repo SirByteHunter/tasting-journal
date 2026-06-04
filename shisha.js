@@ -63,16 +63,44 @@ const App = {
   },
 
   // ── Render: Sammlung ──────────────────────────────────────────
+  populateFilters() {
+    const items = TJ.getItems(this.CATEGORY);
+    const brands = [...new Set(items.map(t => t.brand).filter(Boolean))].sort();
+    const flavors = [...new Set(items.map(t => t.flavor).filter(Boolean))].sort();
+
+    const brandEl = document.getElementById('filterBrand');
+    const flavorEl = document.getElementById('filterFlavor');
+    if (!brandEl || !flavorEl) return;
+
+    const selectedBrand = brandEl.value;
+    const selectedFlavor = flavorEl.value;
+
+    brandEl.innerHTML = '<option value="">Alle Marken</option>' +
+      brands.map(b => `<option value="${escapeHtml(b)}" ${b === selectedBrand ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
+    flavorEl.innerHTML = '<option value="">Alle Geschmacksrichtungen</option>' +
+      flavors.map(f => `<option value="${escapeHtml(f)}" ${f === selectedFlavor ? 'selected' : ''}>${escapeHtml(f)}</option>`).join('');
+  },
+
   renderCollection() {
+    this.populateFilters();
     const container = document.getElementById('cardsContainer');
     const query = document.getElementById('searchInput').value.toLowerCase();
     const sort = document.getElementById('sortSelect').value;
+    const filterBrand = document.getElementById('filterBrand').value;
+    const filterFlavor = document.getElementById('filterFlavor').value;
+    const filterStars = document.getElementById('filterStars').value;
 
-    let list = TJ.getItems(this.CATEGORY).filter(t =>
-      (t.name || '').toLowerCase().includes(query) ||
-      (t.brand || '').toLowerCase().includes(query) ||
-      (t.flavor || '').toLowerCase().includes(query)
-    );
+    let list = TJ.getItems(this.CATEGORY).filter(t => {
+      if (query && !(
+        (t.name || '').toLowerCase().includes(query) ||
+        (t.brand || '').toLowerCase().includes(query) ||
+        (t.flavor || '').toLowerCase().includes(query)
+      )) return false;
+      if (filterBrand && t.brand !== filterBrand) return false;
+      if (filterFlavor && t.flavor !== filterFlavor) return false;
+      if (filterStars && String(t.stars) !== filterStars) return false;
+      return true;
+    });
 
     list.sort((a, b) => {
       if (sort === 'date-desc') return parseInt(b.id) - parseInt(a.id);
