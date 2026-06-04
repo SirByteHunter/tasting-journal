@@ -31,13 +31,13 @@
 
 <div class="container" id="appContent" style="display:none">
 
-  <!-- ── Nutzername ── -->
+  <!-- ── Nutzerprofil ── -->
   <div class="form-card" style="margin-bottom:1.5rem">
     <h2>👤 Nutzerprofil</h2>
     <div class="settings-row">
       <div>
         <strong>Dein Name</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Wird im Header der App angezeigt (z.B. „Heinrichs Whisky").</p>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Wird in der Begrüßung und im Header angezeigt.</p>
       </div>
       <div style="display:flex;gap:0.5rem;align-items:center">
         <input type="text" id="usernameInput" placeholder="Dein Name" style="width:150px" />
@@ -46,29 +46,10 @@
     </div>
   </div>
 
-  <!-- ── GitHub-Verbindung ── -->
-  <div class="form-card" style="margin-bottom:1.5rem">
-    <h2>🔗 GitHub-Verbindung</h2>
-    <div class="settings-row">
-      <div>
-        <strong>Verbundener Gist</strong>
-        <div id="connectionInfo" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem"></div>
-      </div>
-      <button class="btn btn-secondary" onclick="UI.copyGistId()">📋 Gist-ID kopieren</button>
-    </div>
-    <div class="settings-row">
-      <div>
-        <strong>Daten neu laden</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Falls du auf einem anderen Gerät Änderungen gemacht hast.</p>
-      </div>
-      <button class="btn btn-secondary" onclick="reloadAndUpdate()">🔄 Aktualisieren</button>
-    </div>
-  </div>
-
-  <!-- ── Daten-Übersicht ── -->
+  <!-- ── Datenbestand & Verwaltung ── -->
   <div class="form-card" style="margin-bottom:1.5rem">
     <h2>📊 Datenbestand</h2>
-    <div class="stats-grid" style="margin-bottom:0">
+    <div class="stats-grid" style="margin-bottom:1.5rem">
       <div class="stat-card">
         <div class="stat-value" id="totalCount">0</div>
         <div class="stat-label">Verkostungen gesamt</div>
@@ -82,45 +63,12 @@
         <div class="stat-label">Shisha</div>
       </div>
     </div>
-  </div>
-
-  <!-- ── Google Drive ── -->
-  <div class="form-card" style="margin-bottom:1.5rem">
-    <h2>📸 Google Drive – Foto-Speicher</h2>
-    <div id="driveStatus" style="margin-bottom:1rem"></div>
-    <div class="settings-row" id="driveConnectRow">
-      <div>
-        <strong>Mit Google Drive verbinden</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Fotos werden in Google Drive gespeichert statt im Gist. Spart Speicherplatz und skaliert für hunderte Einträge.</p>
-      </div>
-      <button class="btn btn-primary" onclick="connectDrive()" id="driveConnectBtn">🔗 Verbinden</button>
-    </div>
-    <div class="settings-row" id="driveDisconnectRow" style="display:none">
-      <div>
-        <strong style="color:var(--danger)">Google Drive trennen</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Neue Fotos werden wieder lokal im Gist gespeichert. Bestehende Drive-Fotos bleiben erhalten.</p>
-      </div>
-      <button class="btn btn-danger" onclick="disconnectDrive()">🔌 Trennen</button>
-    </div>
-    <div class="settings-row" id="driveMigrateRow" style="display:none">
-      <div>
-        <strong>Bestehende Fotos migrieren</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Alle Base64-Fotos aus dem Gist nach Google Drive verschieben. Verkleinert den Gist erheblich.</p>
-        <div id="migrateProgress" style="display:none;margin-top:0.5rem;font-size:0.85rem;color:var(--amber-light)"></div>
-      </div>
-      <button class="btn btn-secondary" onclick="migratePhotos()" id="driveMigrateBtn">📤 Fotos migrieren</button>
-    </div>
-  </div>
-
-  <!-- ── Import / Export ── -->
-  <div class="form-card" style="margin-bottom:1.5rem">
-    <h2>💾 Datenverwaltung</h2>
     <div class="settings-row">
       <div>
-        <strong>Daten exportieren</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei mit ALLEN Verkostungen (alle Kategorien) herunterladen.</p>
+        <strong>Daten neu laden</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Falls du auf einem anderen Gerät Änderungen gemacht hast.</p>
       </div>
-      <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ Download JSON</button>
+      <button class="btn btn-secondary" onclick="reloadAndUpdate()">🔄 Aktualisieren</button>
     </div>
     <div class="settings-row">
       <div>
@@ -132,11 +80,63 @@
     </div>
     <div class="settings-row">
       <div>
-        <strong>Daten importieren</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">JSON-Datei einlesen. <strong style="color:var(--danger)">Achtung:</strong> Ersetzt ALLE bestehenden Daten komplett. Vorher exportieren als Backup empfohlen.</p>
+        <strong>Daten exportieren</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Nur JSON ohne Fotos herunterladen.</p>
       </div>
-      <button class="btn btn-secondary" onclick="UI.triggerImport()">⬆️ Import JSON</button>
+      <button class="btn btn-secondary" onclick="UI.exportJson()">⬇️ JSON exportieren</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <strong>Daten importieren</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem"><strong style="color:var(--danger)">Achtung:</strong> Ersetzt ALLE bestehenden Daten komplett.</p>
+      </div>
+      <button class="btn btn-secondary" onclick="UI.triggerImport()">⬆️ JSON importieren</button>
       <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="handleImportAndRefresh(event)" />
+    </div>
+  </div>
+
+  <!-- ── Verbindungen ── -->
+  <div class="form-card" style="margin-bottom:1.5rem">
+    <h2>🔗 Verbindungen</h2>
+
+    <!-- GitHub Gist -->
+    <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+      <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.75rem">GitHub Gist</div>
+      <div class="settings-row">
+        <div>
+          <strong>Verbundener Gist</strong>
+          <div id="connectionInfo" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem"></div>
+        </div>
+        <button class="btn btn-secondary" onclick="UI.copyGistId()">📋 ID kopieren</button>
+      </div>
+    </div>
+
+    <!-- Google Drive -->
+    <div>
+      <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.75rem">Google Drive – Foto-Speicher</div>
+      <div id="driveStatus" style="margin-bottom:0.75rem"></div>
+      <div class="settings-row" id="driveConnectRow">
+        <div>
+          <strong>Mit Google Drive verbinden</strong>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Fotos werden in Drive statt im Gist gespeichert. Skaliert für hunderte Einträge.</p>
+        </div>
+        <button class="btn btn-primary" onclick="connectDrive()" id="driveConnectBtn">🔗 Verbinden</button>
+      </div>
+      <div class="settings-row" id="driveDisconnectRow" style="display:none">
+        <div>
+          <strong>Google Drive</strong>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Verbindung trennen – neue Fotos gehen wieder in den Gist. Bestehende Drive-Fotos bleiben erhalten.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="disconnectDrive()">🔌 Trennen</button>
+      </div>
+      <div class="settings-row" id="driveMigrateRow" style="display:none">
+        <div>
+          <strong>Bestehende Fotos migrieren</strong>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Alle Base64-Fotos aus dem Gist nach Google Drive verschieben.</p>
+          <div id="migrateProgress" style="display:none;margin-top:0.5rem;font-size:0.85rem;color:var(--amber-light)"></div>
+        </div>
+        <button class="btn btn-secondary" onclick="migratePhotos()" id="driveMigrateBtn">📤 Fotos migrieren</button>
+      </div>
     </div>
   </div>
 
@@ -145,23 +145,13 @@
     <h2 style="color:var(--danger)">⚠️ Gefahrenzone</h2>
     <div class="settings-row">
       <div>
-        <strong style="color:var(--danger)">Verbindung trennen</strong>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Token und Gist-ID von diesem Gerät entfernen. Deine Daten im Gist bleiben erhalten und sind weiterhin auf anderen Geräten verfügbar. Beim nächsten Aufruf der App musst du die Verbindung neu einrichten.</p>
+        <strong style="color:var(--danger)">Gist-Verbindung trennen</strong>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:0.3rem">Token und Gist-ID von diesem Gerät entfernen. Deine Daten im Gist bleiben erhalten.</p>
       </div>
       <button class="btn btn-danger" onclick="TJ.resetSetup()">🚪 Trennen</button>
     </div>
   </div>
 
-  <!-- ── Hilfe-Hinweis ── -->
-  <div style="margin-top:2rem;padding:1.5rem;background:var(--card);border-radius:10px;border:1px solid var(--border);color:var(--text-muted);font-size:0.9rem;line-height:1.6">
-    <strong style="color:var(--amber-light);display:block;margin-bottom:0.5rem">💡 Tipps</strong>
-    <ul style="list-style:none;padding:0">
-      <li style="margin-bottom:0.5rem">• <strong>Sync-Status</strong> oben im Header zeigt, ob die App synchronisiert ist (grün), gerade syncronisiert (orange) oder offline (rot).</li>
-      <li style="margin-bottom:0.5rem">• <strong>Gist-ID</strong> kannst du auf andere Geräte kopieren, um sie mit denselben Daten zu verbinden.</li>
-      <li style="margin-bottom:0.5rem">• <strong>Regelmäßige Backups</strong> per JSON-Export auf dein iCloud/OneDrive sichern.</li>
-      <li>• <strong>Import ersetzt</strong> alle Daten komplett – nicht zum Zusammenführen geeignet.</li>
-    </ul>
-  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
