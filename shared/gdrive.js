@@ -1,5 +1,6 @@
 // ╔═══════════════════════════════════════════════════════════════╗
 // ║  Google Drive – Foto-Upload für Tasting Journal               ║
+// ║  OAuth2 mit automatischem Silent-Token-Refresh                ║
 // ╚═══════════════════════════════════════════════════════════════╝
 
 const GDrive = {
@@ -12,6 +13,14 @@ const GDrive = {
 
   token: null,
   folderId: null,
+  _refreshPromise: null,
+
+  // ── Redirect URI ───────────────────────────────────────────────
+  getRedirectUri() {
+    return window.location.origin +
+      window.location.pathname.replace(/\/[^/]*$/, '/') +
+      'gdrive-callback.html';
+  },
 
   // ── Token laden ────────────────────────────────────────────────
   loadToken() {
@@ -33,7 +42,9 @@ const GDrive = {
   },
 
   isConnected() {
-    return this.loadToken();
+    // Gilt als verbunden wenn Token vorhanden war (auch abgelaufen) —
+    // silent refresh holt neuen Token automatisch
+    return !!(localStorage.getItem(this.TOKEN_KEY));
   },
 
   disconnect() {
@@ -44,10 +55,80 @@ const GDrive = {
     this.folderId = null;
   },
 
-  // ── OAuth2 Login (Popup) ───────────────────────────────────────
+  // ── Silent Token Refresh via Hidden Iframe ─────────────────────
+  silentRefresh() {
+    // Nur einen gleichzeitigen Refresh zulassen
+    if (this._refreshPromise) return this._refreshPromise;
+
+    this._refreshPromise = new Promise((resolve, reject) => {
+      const redirectUri = this.getRedirectUri();
+      const params = new URLSearchParams({
+        client_id: this.CLIENT_ID,
+        redirect_uri: redirectUri,
+        response_type: 'token',
+        scope: this.SCOPE,
+        prompt: 'none',  // Kein Login-Dialog — schlägt fehl wenn keine aktive Google-Session
+      });
+      const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
+
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('Silent refresh timeout'));
+      }, 10000);
+
+      const handler = (event) => {
+        if (event.origin !== window.location.origin) return;
+        if (event.data && event.data.type === 'gdrive-token') {
+          cleanup();
+          this.saveToken(event.data.token, event.data.expiresIn);
+          resolve(event.data.token);
+        }
+        if (event.data && event.data.type === 'gdrive-error') {
+          cleanup();
+          reject(new Error(event.data.error));
+        }
+      };
+      window.addEventListener('message', handler);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        window.removeEventListener('message', handler);
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      }
+
+      iframe.src = url;
+    }).finally(() => {
+      this._refreshPromise = null;
+    });
+
+    return this._refreshPromise;
+  },
+
+  // ── Token sicherstellen (refresh wenn nötig) ───────────────────
+  async ensureToken() {
+    if (this.loadToken()) return this.token;  // Token noch gültig
+
+    // Kein gültiger Token — silent refresh versuchen
+    if (!localStorage.getItem(this.TOKEN_KEY)) {
+      throw new Error('Nicht mit Google Drive verbunden');
+    }
+    try {
+      await this.silentRefresh();
+      return this.token;
+    } catch (e) {
+      // Silent refresh fehlgeschlagen → Popup-Login nötig
+      throw new Error('Google Drive Sitzung abgelaufen – bitte neu verbinden');
+    }
+  },
+
+  // ── OAuth2 Login (Popup, einmalig) ────────────────────────────
   login() {
     return new Promise((resolve, reject) => {
-      const redirectUri = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + 'gdrive-callback.html';
+      const redirectUri = this.getRedirectUri();
       const params = new URLSearchParams({
         client_id: this.CLIENT_ID,
         redirect_uri: redirectUri,
@@ -67,17 +148,18 @@ const GDrive = {
         if (event.origin !== window.location.origin) return;
         if (event.data && event.data.type === 'gdrive-token') {
           window.removeEventListener('message', handler);
+          clearInterval(check);
           this.saveToken(event.data.token, event.data.expiresIn);
           resolve(event.data.token);
         }
         if (event.data && event.data.type === 'gdrive-error') {
           window.removeEventListener('message', handler);
+          clearInterval(check);
           reject(new Error(event.data.error));
         }
       };
       window.addEventListener('message', handler);
 
-      // Fallback: Popup geschlossen ohne Ergebnis
       const check = setInterval(() => {
         if (popup.closed) {
           clearInterval(check);
@@ -90,7 +172,7 @@ const GDrive = {
 
   // ── API-Aufruf ─────────────────────────────────────────────────
   async apiFetch(url, options = {}) {
-    if (!this.token) throw new Error('Nicht mit Google Drive verbunden');
+    await this.ensureToken();
     const res = await fetch(url, {
       ...options,
       headers: {
@@ -99,8 +181,14 @@ const GDrive = {
       },
     });
     if (res.status === 401) {
-      this.disconnect();
-      throw new Error('Google Drive Token abgelaufen – bitte neu verbinden');
+      // Token abgelaufen trotz Refresh — einmal neu versuchen
+      try {
+        await this.silentRefresh();
+        return this.apiFetch(url, options);
+      } catch (e) {
+        this.disconnect();
+        throw new Error('Google Drive Sitzung abgelaufen – bitte neu verbinden');
+      }
     }
     if (!res.ok) {
       const text = await res.text();
@@ -115,7 +203,6 @@ const GDrive = {
     const cached = localStorage.getItem(this.FOLDER_KEY);
     if (cached) { this.folderId = cached; return cached; }
 
-    // Suchen
     const query = `name='${this.FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
     const search = await this.apiFetch(
       'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(query) + '&fields=files(id,name)'
@@ -126,7 +213,6 @@ const GDrive = {
       return this.folderId;
     }
 
-    // Anlegen
     const created = await this.apiFetch('https://www.googleapis.com/drive/v3/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -142,12 +228,9 @@ const GDrive = {
 
   // ── Foto hochladen ─────────────────────────────────────────────
   async uploadPhoto(dataUrl, filename) {
-    this.loadToken();
-    if (!this.token) throw new Error('Nicht mit Google Drive verbunden');
-
+    await this.ensureToken();
     const folderId = await this.getOrCreateFolder();
 
-    // Base64 → Blob
     const [header, base64] = dataUrl.split(',');
     const mimeType = header.match(/:(.*?);/)[1];
     const binary = atob(base64);
@@ -155,57 +238,37 @@ const GDrive = {
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     const blob = new Blob([bytes], { type: mimeType });
 
-    // Multipart Upload
     const metadata = JSON.stringify({ name: filename, parents: [folderId] });
-    const boundary = 'tasting_journal_boundary';
-    const body = [
-      '--' + boundary,
-      'Content-Type: application/json; charset=UTF-8',
-      '',
-      metadata,
-      '--' + boundary,
-      'Content-Type: ' + mimeType,
-      '',
-      '',
-    ].join('\r\n');
-
     const formData = new FormData();
     formData.append('metadata', new Blob([metadata], { type: 'application/json' }));
     formData.append('file', blob);
 
     const res = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webContentLink,webViewLink',
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
       {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + this.token },
         body: formData,
       }
     );
-    if (res.status === 401) {
-      this.disconnect();
-      throw new Error('Google Drive Token abgelaufen – bitte neu verbinden');
-    }
     if (!res.ok) {
       const text = await res.text();
       throw new Error('Upload fehlgeschlagen: ' + text);
     }
     const file = await res.json();
 
-    // Datei öffentlich lesbar machen
     await this.apiFetch(`https://www.googleapis.com/drive/v3/files/${file.id}/permissions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role: 'reader', type: 'anyone' }),
     });
 
-    // Direkte Bild-URL
     return `https://drive.google.com/thumbnail?id=${file.id}&sz=w1024`;
   },
 
   // ── Foto herunterladen (über API mit Auth-Token) ───────────────
   async downloadPhoto(url) {
-    this.loadToken();
-    // File-ID aus der URL extrahieren
+    await this.ensureToken();
     const match = url.match(/[?&]id=([^&]+)/);
     if (!match) throw new Error('Keine File-ID in URL: ' + url);
     const fileId = match[1];
@@ -223,9 +286,8 @@ const GDrive = {
     const match = url.match(/[?&]id=([^&]+)/);
     if (!match) return;
     const fileId = match[1];
-    this.loadToken();
-    if (!this.token) return;
     try {
+      await this.ensureToken();
       await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
         method: 'DELETE',
         headers: { 'Authorization': 'Bearer ' + this.token },
@@ -234,4 +296,22 @@ const GDrive = {
       console.warn('Foto konnte nicht gelöscht werden:', e);
     }
   },
+
+  // ── Auto-Refresh beim Seitenstart ─────────────────────────────
+  init() {
+    if (!this.isConnected()) return;
+    const expiry = parseInt(localStorage.getItem(this.TOKEN_EXPIRY_KEY) || '0');
+    const remaining = expiry - Date.now();
+    if (remaining < 5 * 60 * 1000) {
+      // Token läuft in weniger als 5 Minuten ab oder ist bereits abgelaufen
+      this.silentRefresh().catch(() => {});
+    }
+  },
 };
+
+// Beim Laden der Seite Token prüfen und ggf. still erneuern
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => GDrive.init());
+} else {
+  GDrive.init();
+}
